@@ -13,6 +13,9 @@ const SUPABASE_PUBLISHABLE_KEY =
 (() => {
   const $ = (id) => document.getElementById(id);
 
+  const $$ = (selector, root = document) =>
+    [...root.querySelectorAll(selector)];
+
   const authScreen = $("authScreen");
   const protectedApp = $("protectedApp");
   const authForm = $("authForm");
@@ -80,13 +83,22 @@ const SUPABASE_PUBLISHABLE_KEY =
 
     element.textContent = message;
     element.hidden = !message;
+
     element.classList.toggle("is-error", Boolean(isError));
-    element.classList.toggle("is-success", Boolean(message) && !isError);
+    element.classList.toggle(
+      "is-success",
+      Boolean(message) && !isError
+    );
+
     element.setAttribute("role", isError ? "alert" : "status");
     element.setAttribute("aria-live", "polite");
   }
 
-  function setButtonLoading(button, loading, loadingText = "Veuillez patienter…") {
+  function setButtonLoading(
+    button,
+    loading,
+    loadingText = "Veuillez patienter…"
+  ) {
     if (!button) return;
 
     if (loading) {
@@ -186,13 +198,19 @@ const SUPABASE_PUBLISHABLE_KEY =
         : "Connectez-vous pour accéder à vos outils crypto.";
     }
 
-    if (nameLabel) nameLabel.hidden = !isSignup;
+    if (nameLabel) {
+      nameLabel.hidden = !isSignup;
+    }
+
     if (nameInput) {
       nameInput.hidden = !isSignup;
       nameInput.required = isSignup;
     }
 
-    if (confirmLabel) confirmLabel.hidden = !isSignup;
+    if (confirmLabel) {
+      confirmLabel.hidden = !isSignup;
+    }
+
     if (confirmInput) {
       confirmInput.hidden = !isSignup;
       confirmInput.required = isSignup;
@@ -218,12 +236,7 @@ const SUPABASE_PUBLISHABLE_KEY =
       signupTab.setAttribute("aria-pressed", String(isSignup));
     }
 
-    if (authForm) {
-      authForm.setAttribute(
-        "data-auth-mode",
-        mode
-      );
-    }
+    authForm.setAttribute("data-auth-mode", mode);
 
     showMessage();
   }
@@ -260,12 +273,8 @@ const SUPABASE_PUBLISHABLE_KEY =
       "[data-user-email], #userEmail, #connectedUserEmail"
     );
 
-    emailElements.forEach(element => {
-      if (element.dataset.userEmail !== undefined) {
-        element.textContent = user.email || "";
-      } else {
-        element.textContent = user.email || "";
-      }
+    emailElements.forEach((element) => {
+      element.textContent = user.email || "";
     });
 
     const name =
@@ -277,12 +286,16 @@ const SUPABASE_PUBLISHABLE_KEY =
       "[data-user-name], #userName, #connectedUserName"
     );
 
-    nameElements.forEach(element => {
+    nameElements.forEach((element) => {
       element.textContent = name || user.email || "";
     });
 
     ensureLogoutButton();
   }
+
+  /* ==========================================
+     BOUTON DE DÉCONNEXION
+  ========================================== */
 
   function ensureLogoutButton() {
     const existingLogoutButton = $("logoutButton");
@@ -295,6 +308,9 @@ const SUPABASE_PUBLISHABLE_KEY =
       protectedApp.querySelector(".header-actions");
 
     if (!headerActions) {
+      console.warn(
+        "CryptoTools Global : conteneur .header-actions introuvable."
+      );
       return;
     }
 
@@ -327,7 +343,9 @@ const SUPABASE_PUBLISHABLE_KEY =
         renderSession(null);
         setMode("login");
 
-        showMessage("Vous avez été déconnecté avec succès.");
+        showMessage(
+          "Vous avez été déconnecté avec succès."
+        );
       } catch (error) {
         console.error(
           "CryptoTools Global : erreur de déconnexion",
@@ -415,7 +433,7 @@ const SUPABASE_PUBLISHABLE_KEY =
      TRAITEMENT DU FORMULAIRE
   ========================================== */
 
-  authForm.addEventListener("submit", async event => {
+  authForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (isBusy || isCheckingSession) {
@@ -482,18 +500,19 @@ const SUPABASE_PUBLISHABLE_KEY =
           return;
         }
 
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: name
-            },
-            emailRedirectTo:
-              window.location.origin +
-              window.location.pathname
-          }
-        });
+        const { data, error } =
+          await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: name
+              },
+              emailRedirectTo:
+                window.location.origin +
+                window.location.pathname
+            }
+          });
 
         if (error) {
           throw error;
@@ -501,7 +520,10 @@ const SUPABASE_PUBLISHABLE_KEY =
 
         if (data?.session) {
           renderSession(data.session);
-          showMessage("Votre compte a été créé avec succès.");
+
+          showMessage(
+            "Votre compte a été créé avec succès."
+          );
         } else {
           showMessage(
             "Compte créé ! Consultez votre boîte e-mail pour confirmer votre adresse avant de vous connecter."
@@ -552,6 +574,7 @@ const SUPABASE_PUBLISHABLE_KEY =
       if (submitButton) {
         submitButton.disabled = false;
         submitButton.removeAttribute("aria-busy");
+
         submitButton.textContent =
           mode === "signup"
             ? "Créer mon compte"
@@ -567,75 +590,83 @@ const SUPABASE_PUBLISHABLE_KEY =
   const forgotPasswordButton = $("forgotPasswordButton");
 
   if (forgotPasswordButton) {
-    forgotPasswordButton.addEventListener("click", async () => {
-      if (isBusy || isResettingPassword) {
-        return;
-      }
-
-      const email = $("authEmail")?.value.trim() || "";
-
-      if (!email) {
-        showMessage(
-          "Saisissez votre adresse e-mail avant de demander un lien.",
-          true
-        );
-
-        $("authEmail")?.focus();
-        return;
-      }
-
-      if (!validateEmail(email)) {
-        showMessage(
-          "Saisissez une adresse e-mail valide.",
-          true
-        );
-
-        $("authEmail")?.focus();
-        return;
-      }
-
-      isResettingPassword = true;
-      setButtonLoading(
-        forgotPasswordButton,
-        true,
-        "Envoi en cours…"
-      );
-
-      showMessage();
-
-      try {
-        const { error } =
-          await supabase.auth.resetPasswordForEmail(
-            email,
-            {
-              redirectTo:
-                window.location.origin +
-                window.location.pathname
-            }
-          );
-
-        if (error) {
-          throw error;
+    forgotPasswordButton.addEventListener(
+      "click",
+      async () => {
+        if (isBusy || isResettingPassword) {
+          return;
         }
 
-        showMessage(
-          "Si cette adresse est enregistrée, un e-mail de réinitialisation sera envoyé."
-        );
-      } catch (error) {
-        console.error(
-          "CryptoTools Global : erreur de réinitialisation",
-          error
+        const email = $("authEmail")?.value.trim() || "";
+
+        if (!email) {
+          showMessage(
+            "Saisissez votre adresse e-mail avant de demander un lien.",
+            true
+          );
+
+          $("authEmail")?.focus();
+          return;
+        }
+
+        if (!validateEmail(email)) {
+          showMessage(
+            "Saisissez une adresse e-mail valide.",
+            true
+          );
+
+          $("authEmail")?.focus();
+          return;
+        }
+
+        isResettingPassword = true;
+
+        setButtonLoading(
+          forgotPasswordButton,
+          true,
+          "Envoi en cours…"
         );
 
-        showMessage(
-          getErrorMessage(error),
-          true
-        );
-      } finally {
-        isResettingPassword = false;
-        setButtonLoading(forgotPasswordButton, false);
+        showMessage();
+
+        try {
+          const { error } =
+            await supabase.auth.resetPasswordForEmail(
+              email,
+              {
+                redirectTo:
+                  window.location.origin +
+                  window.location.pathname
+              }
+            );
+
+          if (error) {
+            throw error;
+          }
+
+          showMessage(
+            "Si cette adresse est enregistrée, un e-mail de réinitialisation sera envoyé."
+          );
+        } catch (error) {
+          console.error(
+            "CryptoTools Global : erreur de réinitialisation",
+            error
+          );
+
+          showMessage(
+            getErrorMessage(error),
+            true
+          );
+        } finally {
+          isResettingPassword = false;
+
+          setButtonLoading(
+            forgotPasswordButton,
+            false
+          );
+        }
       }
-    });
+    );
   }
 
   /* ==========================================
@@ -644,7 +675,8 @@ const SUPABASE_PUBLISHABLE_KEY =
 
   async function initializeAuth() {
     try {
-      const { data, error } = await supabase.auth.getSession();
+      const { data, error } =
+        await supabase.auth.getSession();
 
       if (error) {
         throw error;
@@ -690,7 +722,8 @@ const SUPABASE_PUBLISHABLE_KEY =
       }
     );
 
-  authSubscription = authListener?.subscription || null;
+  authSubscription =
+    authListener?.subscription || null;
 
   /* ==========================================
      ÉCRAN INITIAL
