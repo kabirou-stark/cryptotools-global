@@ -5,8 +5,7 @@
    Conversions, calculateurs et prix crypto
    ========================================== */
 
-const API_URL =
-  "https://api.coingecko.com/api/v3/simple/price";
+const API_URL = "https://api.coingecko.com/api/v3/simple/price";
 
 const ASSETS = {
   bitcoin: {
@@ -37,8 +36,8 @@ const ASSETS = {
 };
 
 /*
- * Parité officielle de l'euro avec le FCFA BCEAO.
- * 1 EUR = 655,957 XOF.
+ * Parité officielle fixe EUR/XOF :
+ * 1 EUR = 655,957 FCFA BCEAO.
  */
 const EUR_TO_XOF = 655.957;
 
@@ -48,88 +47,116 @@ const translations = {
     navConverters: "Convertisseurs",
     navCalculators: "Calculateurs",
     navMarkets: "Marché",
+
     heroBadge: "DES OUTILS CRYPTO GRATUITS",
     heroTitle: 'La crypto, <span>plus simple.</span>',
     heroDescription:
       "Convertissez vos cryptomonnaies, estimez vos gains et consultez les prix du marché depuis une plateforme simple et accessible.",
     heroButton: "Commencer gratuitement",
     heroMarketButton: "Voir les prix",
+
     trustFree: "Outils gratuits",
     trustMobile: "Adapté au mobile",
     trustSimple: "Simple à utiliser",
+
     marketPreview: "Aperçu du marché",
     indicativePrices: "Prix indicatifs",
+
     adPlaceholder:
       "Espace publicitaire — les annonces apparaîtront après configuration d'un fournisseur compatible.",
+
     toolsEyebrow: "NOS OUTILS",
     convertersTitle: "Convertisseurs crypto",
     convertersDescription:
       "Obtenez rapidement une estimation de la valeur de vos cryptomonnaies.",
+
     btcConverterTitle: "Bitcoin vers USDT",
     btcConverterDescription: "Convertissez du BTC en Tether.",
+
     usdtConverterTitle: "USDT vers FCFA",
     usdtConverterDescription:
       "Estimez la valeur de vos USDT en francs CFA BCEAO.",
+
     cryptoConverterTitle: "Crypto vers FCFA",
     cryptoConverterDescription:
       "Estimez la valeur d'une autre cryptomonnaie en FCFA.",
+
     amountLabel: "Montant",
     convertButton: "Convertir",
     estimatedResult: "Résultat estimé",
     popularBadge: "Populaire",
     cryptoLabel: "Cryptomonnaie",
+
     calculatorEyebrow: "CALCULS PRATIQUES",
     calculatorsTitle: "Calculateurs crypto",
     calculatorsDescription:
       "Préparez vos calculs avant une opération.",
+
     profitTitle: "Calculateur de profits et pertes",
     profitDescription:
       "Comparez votre prix d'achat à votre prix de vente.",
+
     buyPriceLabel: "Prix d'achat (USDT)",
     sellPriceLabel: "Prix de vente (USDT)",
     quantityLabel: "Quantité achetée",
     calculateButton: "Calculer",
     profitResultLabel: "Profit / perte estimé",
+
     feesTitle: "Frais de transaction",
     feesDescription:
       "Estimez les frais proportionnels d'une transaction.",
+
     transactionAmountLabel: "Montant de la transaction (USDT)",
     feeRateLabel: "Taux de frais (%)",
     feesResultLabel: "Frais estimés",
+
     feesNote:
       "Les frais réels dépendent de la plateforme et du réseau utilisés.",
+
     marketEyebrow: "SUIVI DU MARCHÉ",
     marketTitle: "Prix des cryptomonnaies",
     marketDescription:
       "Consultez les dernières données disponibles.",
+
     refreshButton: "↻ Actualiser",
     coinColumn: "Actif",
     priceColumn: "Prix (USD)",
     fcfaColumn: "Prix (FCFA)",
     loadingPrices: "Chargement des prix...",
+
     aboutEyebrow: "À PROPOS",
     aboutTitle: "Les outils crypto, accessibles à tous.",
     aboutDescription:
       "CryptoTools Global rassemble des outils gratuits pour convertir des montants, comprendre les frais et estimer des résultats. Les estimations ne garantissent aucun gain financier.",
+
     footerDescription:
       "Des outils crypto simples, gratuits et accessibles.",
+
     footerNavigation: "Navigation",
     footerInformation: "Informations",
     footerAbout: "À propos",
     footerDisclaimer: "Avertissement",
     rightsReserved: "Tous droits réservés.",
+
     footerDisclaimerText:
       "Les informations fournies sont indicatives et ne constituent pas des conseils financiers.",
+
     netAmountLabel: "Montant après frais",
     lastUpdated: "Dernière mise à jour",
+
     priceError: "Prix temporairement indisponibles.",
+
     invalidAmount:
       "Saisis un montant valide supérieur ou égal à zéro.",
+
     enterValues:
       "Renseigne tous les champs avec des valeurs valides.",
+
     dataError:
       "Impossible de charger les prix. Réessaie dans quelques instants.",
+
     fcfaRateLabel: "Taux indicatif utilisé",
+
     marketDisclaimer:
       "Les cours sont indicatifs. Le prix réel peut varier selon la plateforme, le pays, le réseau et les frais appliqués."
   },
@@ -139,91 +166,126 @@ const translations = {
     navConverters: "Converters",
     navCalculators: "Calculators",
     navMarkets: "Market",
+
     heroBadge: "FREE CRYPTO TOOLS",
     heroTitle: 'Crypto, <span>made simpler.</span>',
     heroDescription:
       "Convert cryptocurrencies, estimate profits and check market prices with a simple and accessible platform.",
+
     heroButton: "Get started for free",
     heroMarketButton: "View prices",
+
     trustFree: "Free tools",
     trustMobile: "Mobile friendly",
     trustSimple: "Easy to use",
+
     marketPreview: "Market overview",
     indicativePrices: "Indicative prices",
+
     adPlaceholder:
       "Advertising space — ads will appear after a compatible provider is configured.",
+
     toolsEyebrow: "OUR TOOLS",
     convertersTitle: "Crypto converters",
     convertersDescription:
       "Quickly estimate the value of your cryptocurrencies.",
+
     btcConverterTitle: "Bitcoin to USDT",
     btcConverterDescription: "Convert BTC to Tether.",
+
     usdtConverterTitle: "USDT to CFA francs",
     usdtConverterDescription:
       "Estimate your USDT value in BCEAO CFA francs.",
+
     cryptoConverterTitle: "Crypto to CFA francs",
     cryptoConverterDescription:
       "Estimate another cryptocurrency's value in CFA francs.",
+
     amountLabel: "Amount",
     convertButton: "Convert",
     estimatedResult: "Estimated result",
     popularBadge: "Popular",
     cryptoLabel: "Cryptocurrency",
+
     calculatorEyebrow: "PRACTICAL CALCULATIONS",
     calculatorsTitle: "Crypto calculators",
     calculatorsDescription:
       "Prepare calculations before a transaction.",
+
     profitTitle: "Profit and loss calculator",
     profitDescription:
       "Compare your buying and selling prices.",
+
     buyPriceLabel: "Buy price (USDT)",
     sellPriceLabel: "Sell price (USDT)",
     quantityLabel: "Quantity purchased",
     calculateButton: "Calculate",
     profitResultLabel: "Estimated profit / loss",
+
     feesTitle: "Transaction fees",
     feesDescription:
       "Estimate proportional transaction fees.",
+
     transactionAmountLabel: "Transaction amount (USDT)",
     feeRateLabel: "Fee rate (%)",
     feesResultLabel: "Estimated fees",
+
     feesNote:
       "Actual fees depend on the platform and network used.",
+
     marketEyebrow: "MARKET TRACKER",
     marketTitle: "Cryptocurrency prices",
     marketDescription:
       "View the latest available data.",
+
     refreshButton: "↻ Refresh",
     coinColumn: "Asset",
     priceColumn: "Price (USD)",
     fcfaColumn: "Price (CFA)",
     loadingPrices: "Loading prices...",
+
     aboutEyebrow: "ABOUT",
     aboutTitle: "Crypto tools accessible to everyone.",
+
     aboutDescription:
       "CryptoTools Global provides free tools to convert amounts, understand fees and estimate results. Estimates do not guarantee financial gains.",
+
     footerDescription:
       "Simple, free and accessible crypto tools.",
+
     footerNavigation: "Navigation",
     footerInformation: "Information",
     footerAbout: "About",
     footerDisclaimer: "Disclaimer",
     rightsReserved: "All rights reserved.",
+
     footerDisclaimerText:
       "Information is indicative and does not constitute financial advice.",
+
     netAmountLabel: "Amount after fees",
     lastUpdated: "Last updated",
+
     priceError: "Prices are temporarily unavailable.",
+
     invalidAmount:
       "Enter a valid amount greater than or equal to zero.",
-    enterValues: "Enter valid values in all fields.",
+
+    enterValues:
+      "Enter valid values in all fields.",
+
     dataError:
       "Unable to load prices. Please try again shortly.",
+
     fcfaRateLabel: "Indicative rate used",
+
     marketDisclaimer:
       "Prices are indicative. Actual prices may vary by platform, country, network and fees."
   }
 };
+
+/* ==========================================
+   VARIABLES GLOBALES
+   ========================================== */
 
 let currentLanguage = "fr";
 let marketPrices = {};
@@ -233,14 +295,26 @@ let isFetchingPrices = false;
 
 const $ = (selector) => document.querySelector(selector);
 
+/* ==========================================
+   TRADUCTIONS
+   ========================================== */
+
 function getText(key) {
-  return translations[currentLanguage][key] ||
-    translations.fr[key] ||
-    key;
+  return (
+    translations[currentLanguage]?.[key] ??
+    translations.fr[key] ??
+    key
+  );
 }
 
+/* ==========================================
+   FORMATAGE DES NOMBRES ET DEVISES
+   ========================================== */
+
 function formatNumber(value, maximumFractionDigits = 2) {
-  if (!Number.isFinite(value)) return "--";
+  if (!Number.isFinite(value)) {
+    return "--";
+  }
 
   return new Intl.NumberFormat(
     currentLanguage === "fr" ? "fr-FR" : "en-US",
@@ -252,22 +326,31 @@ function formatNumber(value, maximumFractionDigits = 2) {
 }
 
 function formatMoney(value, currency = "USD") {
-  if (!Number.isFinite(value)) return "--";
+  if (!Number.isFinite(value)) {
+    return "--";
+  }
 
   return new Intl.NumberFormat(
     currentLanguage === "fr" ? "fr-FR" : "en-US",
     {
       style: "currency",
       currency,
-      maximumFractionDigits:
-        currency === "XOF" ? 0 : 2
+      maximumFractionDigits: currency === "XOF" ? 0 : 2
     }
   ).format(value);
 }
 
+/* ==========================================
+   NOTIFICATIONS
+   ========================================== */
+
 function showToast(message) {
   const toast = $("#toast");
-  if (!toast) return;
+
+  if (!toast) {
+    console.warn(message);
+    return;
+  }
 
   toast.textContent = message;
   toast.classList.add("show");
@@ -279,14 +362,27 @@ function showToast(message) {
   }, 3200);
 }
 
+/* ==========================================
+   LECTURE ET VALIDATION DES NOMBRES
+   ========================================== */
+
 function readNumber(selector) {
   const element = $(selector);
 
-  if (!element || element.value.trim() === "") {
+  if (!element) {
     return null;
   }
 
-  const value = Number(element.value);
+  const raw = String(element.value ?? "")
+    .trim()
+    .replace(/\s/g, "")
+    .replace(",", ".");
+
+  if (raw === "") {
+    return null;
+  }
+
+  const value = Number(raw);
 
   return Number.isFinite(value) ? value : null;
 }
@@ -294,6 +390,10 @@ function readNumber(selector) {
 function isNonNegative(value) {
   return value !== null && value >= 0;
 }
+
+/* ==========================================
+   PRIX DES CRYPTOMONNAIES
+   ========================================== */
 
 function getUsdPrice(assetId) {
   const value = marketPrices[assetId]?.usd;
@@ -304,17 +404,23 @@ function getUsdPrice(assetId) {
 }
 
 /*
- * Prix en FCFA :
- * 1. utiliser le prix XOF direct s'il est disponible ;
- * 2. sinon, convertir le prix EUR en XOF ;
- * 3. sinon, retourner null.
+ * Conversion indicative en FCFA :
+ * - priorité au prix XOF direct s'il existe ;
+ * - sinon, utilisation du prix EUR ;
+ * - sinon, conversion USD -> EUR si le taux est disponible.
  *
  * 1 EUR = 655,957 XOF.
+ *
+ * Attention : le cours de marché d'un USDT peut différer
+ * légèrement de 1 USD ou de 1 EUR selon la plateforme.
  */
+
 function getXofPrice(assetId) {
   const asset = marketPrices[assetId];
 
-  if (!asset) return null;
+  if (!asset) {
+    return null;
+  }
 
   if (
     Number.isFinite(asset.xof) &&
@@ -330,8 +436,25 @@ function getXofPrice(assetId) {
     return asset.eur * EUR_TO_XOF;
   }
 
+  if (
+    Number.isFinite(asset.usd) &&
+    asset.usd > 0 &&
+    Number.isFinite(marketPrices.__eurusd) &&
+    marketPrices.__eurusd > 0
+  ) {
+    return (
+      asset.usd /
+      marketPrices.__eurusd *
+      EUR_TO_XOF
+    );
+  }
+
   return null;
 }
+
+/* ==========================================
+   TRADUCTION DE LA PAGE
+   ========================================== */
 
 function translatePage() {
   document.documentElement.lang = currentLanguage;
@@ -340,11 +463,9 @@ function translatePage() {
     const key = element.dataset.i18n;
     const translated = getText(key);
 
-    if (element.tagName === "INPUT") {
-      return;
+    if (element.tagName !== "INPUT") {
+      element.innerHTML = translated;
     }
-
-    element.innerHTML = translated;
   });
 
   const languageSelect = $("#languageSelect");
@@ -359,10 +480,16 @@ function translatePage() {
   updateUsdtRateNote();
 }
 
+/* ==========================================
+   DERNIÈRE MISE À JOUR
+   ========================================== */
+
 function updateLastUpdatedLabel() {
   const element = $("#lastUpdated");
 
-  if (!element) return;
+  if (!element) {
+    return;
+  }
 
   if (!lastSuccessfulUpdate) {
     element.textContent = getText("loadingPrices");
@@ -380,6 +507,10 @@ function updateLastUpdatedLabel() {
   element.textContent =
     `${getText("lastUpdated")} : ${formatted}`;
 }
+
+/* ==========================================
+   PRIX DANS LA SECTION PRINCIPALE
+   ========================================== */
 
 function updateHeroPrices() {
   const btc = getUsdPrice("bitcoin");
@@ -411,14 +542,24 @@ function updateHeroPrices() {
   }
 }
 
+/* ==========================================
+   TABLEAU DES PRIX
+   ========================================== */
+
 function renderMarketTable() {
   const tbody = $("#marketTableBody");
 
-  if (!tbody) return;
+  if (!tbody) {
+    return;
+  }
 
   const ids = Object.keys(ASSETS);
 
-  if (!ids.some((id) => getUsdPrice(id) !== null)) {
+  const hasPrices = ids.some(
+    (id) => getUsdPrice(id) !== null
+  );
+
+  if (!hasPrices) {
     tbody.innerHTML = `
       <tr>
         <td colspan="3" class="loading-cell">
@@ -439,45 +580,77 @@ function renderMarketTable() {
       <tr>
         <td>
           <div class="market-asset">
-            <span class="market-asset-icon">${escapeHtml(asset.icon)}</span>
+            <span class="market-asset-icon">
+              ${escapeHtml(asset.icon)}
+            </span>
+
             <span class="market-asset-info">
               <strong>${escapeHtml(asset.name)}</strong>
               <span>${escapeHtml(asset.symbol)}</span>
             </span>
           </div>
         </td>
+
         <td class="market-price">
-          ${usd === null ? "--" : escapeHtml(formatMoney(usd, "USD"))}
+          ${
+            usd === null
+              ? "--"
+              : escapeHtml(formatMoney(usd, "USD"))
+          }
         </td>
+
         <td class="market-price">
-          ${xof === null ? "--" : escapeHtml(formatMoney(xof, "XOF"))}
+          ${
+            xof === null
+              ? "--"
+              : escapeHtml(formatMoney(xof, "XOF"))
+          }
         </td>
       </tr>
     `;
   }).join("");
 }
 
+/* ==========================================
+   PROTECTION DU HTML
+   ========================================== */
+
 function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[character]);
+  return String(value).replace(/[&<>"']/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    };
+
+    return entities[character];
+  });
 }
+
+/* ==========================================
+   TAUX USDT / FCFA
+   ========================================== */
 
 function updateUsdtRateNote() {
   const note = $("#usdtRateNote");
 
-  if (!note) return;
+  if (!note) {
+    return;
+  }
 
   const rate = getXofPrice("tether");
 
+  if (rate === null) {
+    note.textContent =
+      `${getText("fcfaRateLabel")} : --`;
+
+    return;
+  }
+
   note.textContent =
-    rate === null
-      ? `${getText("fcfaRateLabel")} : --`
-      : `${getText("fcfaRateLabel")} : 1 USDT ≈ ${formatMoney(rate, "XOF")}`;
+    `${getText("fcfaRateLabel")} : 1 USDT ≈ ${formatMoney(rate, "XOF")}`;
 }
 
 /* ==========================================
@@ -485,7 +658,9 @@ function updateUsdtRateNote() {
    ========================================== */
 
 async function fetchPrices() {
-  if (isFetchingPrices) return;
+  if (isFetchingPrices) {
+    return;
+  }
 
   isFetchingPrices = true;
 
@@ -496,65 +671,153 @@ async function fetchPrices() {
     button.style.opacity = "0.65";
   }
 
+  const ids = Object.keys(ASSETS).join(",");
+
+  /*
+   * XOF n'est pas toujours disponible sur l'API.
+   * On demande USD et EUR, puis on calcule le FCFA
+   * avec le taux fixe EUR/XOF.
+   *
+   * Une deuxième tentative demande uniquement USD
+   * si la première requête échoue.
+   */
+
+  const urls = [
+    `${API_URL}?${new URLSearchParams({
+      ids,
+      vs_currencies: "usd,eur"
+    })}`,
+
+    `${API_URL}?${new URLSearchParams({
+      ids,
+      vs_currencies: "usd"
+    })}`
+  ];
+
   try {
-    const params = new URLSearchParams({
-      ids: Object.keys(ASSETS).join(","),
-      vs_currencies: "usd,eur,xof"
-    });
+    let data = null;
+    let lastError = null;
 
-    const response = await fetch(
-      `${API_URL}?${params.toString()}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        },
-        cache: "no-store"
+    for (const url of urls) {
+      let timeoutId;
+
+      try {
+        const controller = new AbortController();
+
+        timeoutId = window.setTimeout(() => {
+          controller.abort();
+        }, 12000);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: "application/json"
+          },
+          cache: "no-store",
+          signal: controller.signal
+        });
+
+        window.clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(
+            `API response: ${response.status}`
+          );
+        }
+
+        const json = await response.json();
+
+        if (
+          json &&
+          typeof json === "object" &&
+          Object.keys(json).length > 0
+        ) {
+          data = json;
+          break;
+        }
+
+        throw new Error(
+          "Aucune donnée de prix exploitable."
+        );
+      } catch (error) {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId);
+        }
+
+        lastError = error;
       }
-    );
-
-    if (!response.ok) {
-      throw new Error(`API response: ${response.status}`);
     }
 
-    const data = await response.json();
+    if (!data) {
+      throw lastError || new Error("Aucun prix reçu.");
+    }
 
     let receivedAnyPrice = false;
 
     for (const id of Object.keys(ASSETS)) {
       const item = data[id];
 
-      if (!item) continue;
+      if (!item) {
+        continue;
+      }
 
       const usd = Number(item.usd);
       const eur = Number(item.eur);
       const xof = Number(item.xof);
 
-      marketPrices[id] = {
-        usd: Number.isFinite(usd) && usd > 0
-          ? usd
-          : null,
+      const parsedPrices = {
+        usd:
+          Number.isFinite(usd) && usd > 0
+            ? usd
+            : null,
 
-        eur: Number.isFinite(eur) && eur > 0
-          ? eur
-          : null,
+        eur:
+          Number.isFinite(eur) && eur > 0
+            ? eur
+            : null,
 
-        xof: Number.isFinite(xof) && xof > 0
-          ? xof
-          : null
+        xof:
+          Number.isFinite(xof) && xof > 0
+            ? xof
+            : null
       };
 
+      marketPrices[id] = parsedPrices;
+
       if (
-        marketPrices[id].usd !== null ||
-        marketPrices[id].eur !== null ||
-        marketPrices[id].xof !== null
+        parsedPrices.usd !== null ||
+        parsedPrices.eur !== null ||
+        parsedPrices.xof !== null
       ) {
         receivedAnyPrice = true;
       }
     }
 
     if (!receivedAnyPrice) {
-      throw new Error("No usable price data returned by API");
+      throw new Error(
+        "Aucun prix valide retourné par l'API."
+      );
+    }
+
+    /*
+     * Calcul du taux EUR/USD à partir de Bitcoin,
+     * si les deux cours sont disponibles.
+     *
+     * Ce taux sert uniquement de solution de secours
+     * lorsque le cours EUR manque pour un actif.
+     */
+
+    const btcPrices = marketPrices.bitcoin;
+
+    if (
+      btcPrices &&
+      Number.isFinite(btcPrices.usd) &&
+      btcPrices.usd > 0 &&
+      Number.isFinite(btcPrices.eur) &&
+      btcPrices.eur > 0
+    ) {
+      marketPrices.__eurusd =
+        btcPrices.usd / btcPrices.eur;
     }
 
     lastSuccessfulUpdate = new Date();
@@ -598,12 +861,12 @@ async function fetchPrices() {
 }
 
 /* ==========================================
-   BTC -> USDT
+   CONVERTISSEUR BTC -> USDT
    ========================================== */
 
 function convertBtc() {
   const amount = readNumber("#btcAmount");
-  const price = getUsdPrice("bitcoin");
+  const btcPrice = getUsdPrice("bitcoin");
   const usdtPrice = getUsdPrice("tether");
 
   if (!isNonNegative(amount)) {
@@ -612,7 +875,7 @@ function convertBtc() {
   }
 
   if (
-    price === null ||
+    btcPrice === null ||
     usdtPrice === null ||
     usdtPrice <= 0
   ) {
@@ -620,7 +883,9 @@ function convertBtc() {
     return;
   }
 
-  const result = amount * price / usdtPrice;
+  const result =
+    amount * btcPrice / usdtPrice;
+
   const output = $("#btcResult");
 
   if (output) {
@@ -630,7 +895,7 @@ function convertBtc() {
 }
 
 /* ==========================================
-   USDT -> FCFA
+   CONVERTISSEUR USDT -> FCFA
    ========================================== */
 
 function convertUsdt() {
@@ -656,19 +921,22 @@ function convertUsdt() {
 }
 
 /* ==========================================
-   CRYPTO SELECTION -> FCFA
+   CONVERTISSEUR CRYPTO -> FCFA
    ========================================== */
 
 function updateCryptoUnit() {
   const select = $("#cryptoSelect");
 
-  if (!select) return;
+  if (!select) {
+    return;
+  }
 
   const asset = ASSETS[select.value];
   const unit = $("#cryptoUnit");
 
   if (unit) {
-    unit.textContent = asset ? asset.symbol : "CRYPTO";
+    unit.textContent =
+      asset ? asset.symbol : "CRYPTO";
   }
 }
 
@@ -676,10 +944,11 @@ function convertCrypto() {
   const amount = readNumber("#cryptoAmount");
   const select = $("#cryptoSelect");
 
-  if (!select) return;
+  if (!select) {
+    return;
+  }
 
-  const id = select.value;
-  const price = getXofPrice(id);
+  const price = getXofPrice(select.value);
 
   if (!isNonNegative(amount)) {
     showToast(getText("invalidAmount"));
@@ -819,7 +1088,10 @@ function updateAllCalculations() {
   const amount = readNumber("#transactionAmount");
   const rate = readNumber("#feeRate");
 
-  if (amount !== null && rate !== null) {
+  if (
+    amount !== null &&
+    rate !== null
+  ) {
     calculateFees();
   }
 }
@@ -832,7 +1104,9 @@ function setupMobileMenu() {
   const button = $("#menuToggle");
   const nav = $("#mainNav");
 
-  if (!button || !nav) return;
+  if (!button || !nav) {
+    return;
+  }
 
   button.addEventListener("click", () => {
     const open = nav.classList.toggle("open");
@@ -842,7 +1116,8 @@ function setupMobileMenu() {
       String(open)
     );
 
-    button.textContent = open ? "✕" : "☰";
+    button.textContent =
+      open ? "✕" : "☰";
   });
 
   nav.querySelectorAll("a").forEach((link) => {
@@ -896,7 +1171,9 @@ function setupEvents() {
   if (languageSelect) {
     languageSelect.addEventListener("change", (event) => {
       currentLanguage =
-        event.target.value === "en" ? "en" : "fr";
+        event.target.value === "en"
+          ? "en"
+          : "fr";
 
       translatePage();
     });
@@ -905,12 +1182,14 @@ function setupEvents() {
   const yearElement = $("#currentYear");
 
   if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
+    yearElement.textContent =
+      new Date().getFullYear();
   }
 
   /*
-   * Recalculer les résultats quand les champs changent.
+   * Recalcul automatique lorsque les champs changent.
    */
+
   const inputSelectors = [
     "#btcAmount",
     "#usdtAmount",
@@ -925,11 +1204,14 @@ function setupEvents() {
   inputSelectors.forEach((selector) => {
     const input = $(selector);
 
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
-    input.addEventListener("input", () => {
-      updateAllCalculations();
-    });
+    input.addEventListener(
+      "input",
+      updateAllCalculations
+    );
   });
 
   setupMobileMenu();
@@ -945,7 +1227,9 @@ function initializeSite() {
   translatePage();
   fetchPrices();
 
-  // Actualisation périodique des cours.
+  /*
+   * Actualisation des cours toutes les 2 minutes.
+   */
   window.setInterval(fetchPrices, 120000);
 }
 
