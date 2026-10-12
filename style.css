@@ -1,8 +1,8 @@
 /* =========================================================
    CRYPTOTOOLS GLOBAL
-   Feuille de style complète
-   Design : blanc, bleu marine et bleu professionnel
-   Responsive : mobile, tablette et ordinateur
+   FEUILLE DE STYLE COMPLÈTE ET CORRIGÉE
+   Design professionnel : blanc, bleu marine et couleurs crypto
+   Responsive : iPhone, mobile, tablette et ordinateur
    ========================================================= */
 
 /* =========================
@@ -39,6 +39,21 @@
   --yellow: #f59e0b;
   --yellow-light: #fffbeb;
 
+  --bitcoin: #f7931a;
+  --bitcoin-light: #fff4e5;
+
+  --ethereum: #627eea;
+  --ethereum-light: #eef0ff;
+
+  --bnb: #f3ba2f;
+  --bnb-light: #fff9df;
+
+  --solana: #14b8a6;
+  --solana-light: #e6fffb;
+
+  --tether: #26a17b;
+  --tether-light: #e8fff5;
+
   --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
   --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.07);
   --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.10);
@@ -49,11 +64,12 @@
   --radius-xl: 26px;
 
   --container: 1180px;
-
   --transition: 0.25s ease;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -65,6 +81,8 @@ html {
 body {
   margin: 0;
   padding: 0;
+  min-width: 320px;
+
   font-family:
     Inter,
     -apple-system,
@@ -150,7 +168,8 @@ p {
   margin-top: 0;
 }
 
-[hidden] {
+[hidden],
+.hidden {
   display: none !important;
 }
 
@@ -208,10 +227,6 @@ section {
   font-size: 13px;
 }
 
-.hidden {
-  display: none !important;
-}
-
 
 /* =========================
    3. MARQUE ET LOGO
@@ -226,7 +241,6 @@ section {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
-
   white-space: nowrap;
 }
 
@@ -246,10 +260,9 @@ section {
 
   width: 42px;
   height: 42px;
-
   flex-shrink: 0;
-  border-radius: 12px;
 
+  border-radius: 12px;
   color: var(--white);
   background: linear-gradient(135deg, var(--navy), var(--blue));
 
@@ -291,7 +304,6 @@ header {
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-
   flex-wrap: wrap;
 }
 
@@ -313,17 +325,13 @@ nav a,
 }
 
 nav a:hover,
-.nav-link:hover {
-  color: var(--blue);
-}
-
+.nav-link:hover,
 nav a.active {
   color: var(--blue);
 }
 
 .menu-toggle {
   display: none;
-
   align-items: center;
   justify-content: center;
 
@@ -335,7 +343,6 @@ nav a.active {
 
   color: var(--navy);
   background: var(--white);
-
   font-size: 21px;
 }
 
@@ -380,7 +387,6 @@ nav a.active {
   color: var(--white);
   background: var(--blue);
   border-color: var(--blue);
-
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.16);
 }
 
@@ -389,7 +395,6 @@ nav a.active {
   color: var(--white);
   background: var(--blue-dark);
   border-color: var(--blue-dark);
-
   box-shadow: 0 7px 18px rgba(37, 99, 235, 0.22);
 }
 
@@ -452,7 +457,6 @@ nav a.active {
 .hero {
   position: relative;
   overflow: hidden;
-
   padding: 76px 0 64px;
 
   background:
@@ -527,7 +531,7 @@ nav a.active {
 
 .hero-visual {
   position: relative;
-
+  min-width: 0;
   min-height: 300px;
   padding: 24px;
 
@@ -567,11 +571,12 @@ nav a.active {
 
 
 /* =========================
-   7. PRIX ET MARCHÉ CRYPTO
+   7. APERÇU DU MARCHÉ
    ========================= */
 
 .market-strip {
-  padding: 24px 0;
+  padding: 28px 0;
+
   background: var(--white);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -580,13 +585,13 @@ nav a.active {
 .market-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .market-card,
 .crypto-card {
   min-width: 0;
-  padding: 20px;
+  padding: 21px;
 
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -612,7 +617,6 @@ nav a.active {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-
   margin-bottom: 14px;
 }
 
@@ -658,7 +662,6 @@ nav a.active {
   flex-shrink: 0;
 
   border-radius: 50%;
-
   color: var(--navy);
   background: var(--background-soft);
 
@@ -672,12 +675,134 @@ nav a.active {
   font-weight: 700;
 }
 
+
+/* =========================
+   8. APERÇU DES COURS
+   Classes réellement utilisées dans index.html
+   ========================= */
+
+.preview-coin {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  min-width: 0;
+  padding: 15px 0;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-coin:last-child {
+  border-bottom: none;
+}
+
+.coin-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+
+  border-radius: 50%;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.coin-symbol.bitcoin {
+  color: #ffffff;
+  background: linear-gradient(135deg, #ffb347, var(--bitcoin));
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.22);
+}
+
+.coin-symbol.ethereum {
+  color: #ffffff;
+  background: linear-gradient(135deg, #8fa2ff, var(--ethereum));
+  box-shadow: 0 4px 12px rgba(98, 126, 234, 0.22);
+}
+
+.coin-symbol.solana {
+  color: #ffffff;
+  background: linear-gradient(135deg, #2dd4bf, #0f766e);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.22);
+}
+
+.coin-info {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.coin-info strong {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.coin-info span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.coin-price {
+  margin-left: auto;
+
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 800;
+  text-align: right;
+
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-coin:has(.coin-symbol.bitcoin) .coin-price {
+  color: #c96c00;
+}
+
+.preview-coin:has(.coin-symbol.ethereum) .coin-price {
+  color: #526bd3;
+}
+
+.preview-coin:has(.coin-symbol.solana) .coin-price {
+  color: #0f9488;
+}
+
+#heroBtcPrice {
+  color: #c96c00;
+}
+
+#heroEthPrice {
+  color: #526bd3;
+}
+
+#heroSolPrice {
+  color: #0f9488;
+}
+
+#heroBtcChange,
+#heroEthChange,
+#heroSolChange {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================
+   9. TABLEAU DES MARCHÉS
+   ========================= */
+
+.table-wrapper,
 .market-table-wrapper {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 17px;
 
   background: var(--white);
   box-shadow: var(--shadow-sm);
@@ -685,43 +810,261 @@ nav a.active {
 
 .market-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
 }
 
 .market-table th,
 .market-table td {
-  padding: 15px 18px;
+  padding: 17px 20px;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
 
 .market-table th {
   color: var(--text-secondary);
-  background: var(--background);
+  background: #f8faff;
 
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
 }
 
 .market-table td {
   color: var(--text);
+  background: var(--white);
   font-size: 14px;
+}
+
+.market-table tbody tr {
+  transition: background var(--transition);
 }
 
 .market-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.market-table tbody tr:hover {
+.market-table tbody tr:hover td {
   background: #f8fbff;
+}
+
+.market-table th:first-child {
+  border-top-left-radius: 16px;
+}
+
+.market-table th:last-child {
+  border-top-right-radius: 16px;
+}
+
+.market-asset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 150px;
+}
+
+.market-asset-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+
+  border-radius: 50%;
+
+  color: var(--navy);
+  background: var(--background-soft);
+
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.market-asset-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.market-asset-info strong {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.market-asset-info span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.market-price {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.market-table td.market-price:nth-child(2) {
+  color: var(--blue-dark);
+}
+
+.market-table td.market-price:nth-child(3) {
+  color: var(--green);
+}
+
+/* Bitcoin */
+
+.market-table tbody tr:has(.market-asset-icon.bitcoin) .market-asset-icon,
+.market-asset-icon.bitcoin {
+  color: #ffffff;
+  background: var(--bitcoin);
+}
+
+.market-table tbody tr:has(.market-asset-icon.bitcoin) td.market-price:nth-child(2) {
+  color: #c96c00;
+}
+
+/* Ethereum */
+
+.market-table tbody tr:has(.market-asset-icon.ethereum) .market-asset-icon,
+.market-asset-icon.ethereum {
+  color: #ffffff;
+  background: var(--ethereum);
+}
+
+.market-table tbody tr:has(.market-asset-icon.ethereum) td.market-price:nth-child(2) {
+  color: #526bd3;
+}
+
+/* BNB */
+
+.market-table tbody tr:has(.market-asset-icon.bnb) .market-asset-icon,
+.market-asset-icon.bnb {
+  color: #513c00;
+  background: var(--bnb-light);
+  border: 1px solid #f5d879;
+}
+
+.market-table tbody tr:has(.market-asset-icon.bnb) td.market-price:nth-child(2) {
+  color: #b8860b;
+}
+
+/* Solana */
+
+.market-table tbody tr:has(.market-asset-icon.solana) .market-asset-icon,
+.market-asset-icon.solana {
+  color: #ffffff;
+  background: linear-gradient(135deg, #14b8a6, #6d5dfc);
+}
+
+.market-table tbody tr:has(.market-asset-icon.solana) td.market-price:nth-child(2) {
+  color: #0f9488;
+}
+
+/* Tether */
+
+.market-table tbody tr:has(.market-asset-icon.tether) .market-asset-icon,
+.market-asset-icon.tether {
+  color: #ffffff;
+  background: var(--tether);
+}
+
+.market-table tbody tr:has(.market-asset-icon.tether) td.market-price:nth-child(2) {
+  color: var(--tether);
+}
+
+/* Autres actifs */
+
+.market-table tbody tr:has(.market-asset-icon.usdt) .market-asset-icon,
+.market-asset-icon.usdt {
+  color: #ffffff;
+  background: var(--tether);
+}
+
+.market-table tbody tr:has(.market-asset-icon.xrp) .market-asset-icon,
+.market-asset-icon.xrp {
+  color: #ffffff;
+  background: #23292f;
+}
+
+.market-table tbody tr:has(.market-asset-icon.ada) .market-asset-icon,
+.market-asset-icon.ada {
+  color: #ffffff;
+  background: #3468d4;
+}
+
+.market-table tbody tr:has(.market-asset-icon.doge) .market-asset-icon,
+.market-asset-icon.doge {
+  color: #ffffff;
+  background: #c2a633;
+}
+
+.market-table tbody tr:has(.market-asset-icon.ton) .market-asset-icon,
+.market-asset-icon.ton {
+  color: #ffffff;
+  background: #0098ea;
+}
+
+.market-table tbody tr:has(.market-asset-icon.dot) .market-asset-icon,
+.market-asset-icon.dot {
+  color: #ffffff;
+  background: #e6007a;
+}
+
+.market-table tbody tr:has(.market-asset-icon.avax) .market-asset-icon,
+.market-asset-icon.avax {
+  color: #ffffff;
+  background: #e84142;
+}
+
+.market-table tbody tr:has(.market-asset-icon.link) .market-asset-icon,
+.market-asset-icon.link {
+  color: #ffffff;
+  background: #2a5ada;
+}
+
+#refreshPricesButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 42px;
+  padding: 10px 16px;
+
+  border: 1px solid var(--blue-border);
+  border-radius: 10px;
+
+  color: var(--blue-dark);
+  background: var(--blue-light);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
+}
+
+#refreshPricesButton:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+#refreshPricesButton:disabled {
+  transform: none;
 }
 
 
 /* =========================
-   8. CARTES ET GRILLES
+   10. CARTES ET GRILLES
    ========================= */
 
 .grid {
@@ -779,11 +1122,9 @@ nav a.active {
 
   width: 48px;
   height: 48px;
-
   margin-bottom: 18px;
 
   border-radius: 14px;
-
   color: var(--blue);
   background: var(--blue-light);
 
@@ -792,7 +1133,7 @@ nav a.active {
 
 
 /* =========================
-   9. OUTILS ET CONVERTISSEURS
+   11. OUTILS ET CONVERTISSEURS
    ========================= */
 
 .tools-section {
@@ -834,11 +1175,9 @@ nav a.active {
 
   width: 46px;
   height: 46px;
-
   margin-bottom: 16px;
 
   border-radius: 13px;
-
   color: var(--blue);
   background: var(--blue-light);
 
@@ -898,7 +1237,7 @@ nav a.active {
 
 
 /* =========================
-   10. FORMULAIRES
+   12. FORMULAIRES
    ========================= */
 
 .form-group {
@@ -918,7 +1257,6 @@ select,
 textarea {
   width: 100%;
   min-height: 46px;
-
   padding: 12px 14px;
 
   border: 1px solid var(--border-dark);
@@ -994,7 +1332,7 @@ input[type="radio"] {
 
 
 /* =========================
-   11. PAGE CONNEXION
+   13. PAGE CONNEXION
    ========================= */
 
 .auth-screen {
@@ -1008,7 +1346,6 @@ input[type="radio"] {
   min-height: 100dvh;
 
   padding: 36px 18px;
-
   overflow: hidden;
 
   background:
@@ -1027,7 +1364,6 @@ input[type="radio"] {
 
 .auth-screen::before {
   content: "";
-
   position: absolute;
   top: -140px;
   right: -110px;
@@ -1043,7 +1379,6 @@ input[type="radio"] {
 
 .auth-screen::after {
   content: "";
-
   position: absolute;
   bottom: -180px;
   left: -130px;
@@ -1063,7 +1398,6 @@ input[type="radio"] {
 
   width: 100%;
   max-width: 455px;
-
   padding: 36px;
 
   border: 1px solid rgba(226, 232, 240, 0.95);
@@ -1079,7 +1413,6 @@ input[type="radio"] {
 .auth-brand {
   display: flex;
   justify-content: center;
-
   margin-bottom: 32px;
 }
 
@@ -1095,7 +1428,6 @@ input[type="radio"] {
 
 .auth-subtitle {
   max-width: 330px;
-
   margin: 0 auto 25px;
 
   color: var(--text-secondary);
@@ -1114,7 +1446,6 @@ input[type="radio"] {
 
   border: 1px solid var(--border);
   border-radius: 12px;
-
   background: var(--background-soft);
 }
 
@@ -1148,7 +1479,6 @@ input[type="radio"] {
 .auth-tab.is-active {
   color: var(--blue);
   background: var(--white);
-
   border-color: var(--border);
   box-shadow: var(--shadow-sm);
 }
@@ -1167,9 +1497,7 @@ input[type="radio"] {
 .auth-form input {
   min-height: 49px;
   padding: 13px 14px;
-
   border-radius: 10px;
-
   font-size: 14px;
 }
 
@@ -1181,11 +1509,8 @@ input[type="radio"] {
 .auth-form .button-primary {
   width: 100%;
   min-height: 50px;
-
   margin-top: 12px;
-
   border-radius: 10px;
-
   font-size: 14px;
   font-weight: 800;
 }
@@ -1197,12 +1522,10 @@ input[type="radio"] {
 
 .auth-forgot {
   display: block;
-
   margin: 17px auto 0;
   padding: 6px;
 
   border: none;
-
   color: var(--blue);
   background: transparent;
 
@@ -1228,7 +1551,6 @@ input[type="radio"] {
 
   font-size: 13px;
   line-height: 1.65;
-
   overflow-wrap: anywhere;
 }
 
@@ -1262,7 +1584,7 @@ input[type="radio"] {
 
 
 /* =========================
-   12. PROFIT / FRAIS / CALCULS
+   14. CALCULATEURS
    ========================= */
 
 .calculator-card {
@@ -1314,7 +1636,7 @@ input[type="radio"] {
 
 
 /* =========================
-   13. BADGES ET INDICATEURS
+   15. BADGES
    ========================= */
 
 .badge {
@@ -1362,7 +1684,7 @@ input[type="radio"] {
 
 
 /* =========================
-   14. MESSAGES ET NOTIFICATIONS
+   16. ALERTES ET NOTIFICATIONS
    ========================= */
 
 .alert {
@@ -1409,7 +1731,6 @@ input[type="radio"] {
   z-index: 1000;
 
   max-width: min(380px, calc(100vw - 32px));
-
   padding: 14px 18px;
 
   border: 1px solid var(--border);
@@ -1440,7 +1761,7 @@ input[type="radio"] {
 
 
 /* =========================
-   15. SECTIONS À PROPOS
+   17. SECTION À PROPOS
    ========================= */
 
 .about-section {
@@ -1460,6 +1781,7 @@ input[type="radio"] {
 .feature-list {
   display: grid;
   gap: 14px;
+
   padding: 0;
   margin: 25px 0;
 
@@ -1486,7 +1808,6 @@ input[type="radio"] {
   flex-shrink: 0;
 
   border-radius: 50%;
-
   color: var(--green);
   background: var(--green-light);
 
@@ -1496,7 +1817,7 @@ input[type="radio"] {
 
 
 /* =========================
-   16. PUBLICITÉS
+   18. PUBLICITÉS
    ========================= */
 
 .ad-container,
@@ -1528,7 +1849,7 @@ input[type="radio"] {
 
 
 /* =========================
-   17. FOOTER
+   19. FOOTER
    ========================= */
 
 .site-footer,
@@ -1567,14 +1888,10 @@ footer a:hover {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr;
   gap: 38px;
-
   padding-bottom: 30px;
 }
 
-.footer-brand .brand {
-  color: var(--white);
-}
-
+.footer-brand .brand,
 .footer-brand .brand:hover {
   color: var(--white);
 }
@@ -1596,7 +1913,6 @@ footer a:hover {
   gap: 20px;
 
   padding-top: 22px;
-
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 
   color: #94a3b8;
@@ -1605,15 +1921,13 @@ footer a:hover {
 
 
 /* =========================
-   18. SÉPARATEURS ET UTILITAIRES
+   20. UTILITAIRES
    ========================= */
 
 .divider {
   width: 100%;
   height: 1px;
-
   margin: 24px 0;
-
   background: var(--border);
 }
 
@@ -1676,7 +1990,7 @@ footer a:hover {
 
 
 /* =========================
-   19. TABLETTES
+   21. TABLETTES
    ========================= */
 
 @media (max-width: 1024px) {
@@ -1692,10 +2006,7 @@ footer a:hover {
     font-size: clamp(32px, 5vw, 48px);
   }
 
-  .grid-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
+  .grid-4,
   .grid-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1715,11 +2026,16 @@ footer a:hover {
   .brand {
     font-size: 18px;
   }
+
+  .market-table th,
+  .market-table td {
+    padding: 15px 14px;
+  }
 }
 
 
 /* =========================
-   20. MOBILES
+   22. MOBILES
    ========================= */
 
 @media (max-width: 768px) {
@@ -1810,6 +2126,10 @@ footer a:hover {
     flex: 1;
   }
 
+  .market-strip {
+    padding: 22px 0;
+  }
+
   .market-grid {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -1826,10 +2146,7 @@ footer a:hover {
 
   .grid-2,
   .grid-3,
-  .grid-4 {
-    grid-template-columns: 1fr;
-  }
-
+  .grid-4,
   .tools-grid {
     grid-template-columns: 1fr;
   }
@@ -1844,9 +2161,41 @@ footer a:hover {
     grid-template-columns: 1fr;
   }
 
+  .table-wrapper,
+  .market-table-wrapper {
+    border-radius: 13px;
+  }
+
+  .market-table {
+    min-width: 520px;
+  }
+
   .market-table th,
   .market-table td {
     padding: 12px;
+    font-size: 12px;
+  }
+
+  .market-asset {
+    gap: 9px;
+  }
+
+  .market-asset-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    font-size: 16px;
+  }
+
+  .market-asset-info strong {
+    font-size: 12px;
+  }
+
+  .market-asset-info span {
+    font-size: 11px;
+  }
+
+  .market-price {
     font-size: 12px;
   }
 
@@ -1890,7 +2239,7 @@ footer a:hover {
 
 
 /* =========================
-   21. PETITS ÉCRANS
+   23. PETITS ÉCRANS
    ========================= */
 
 @media (max-width: 480px) {
@@ -1959,6 +2308,30 @@ footer a:hover {
     text-align: left;
   }
 
+  .preview-coin {
+    gap: 10px;
+    padding: 13px 0;
+  }
+
+  .coin-symbol {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    font-size: 18px;
+  }
+
+  .coin-info strong {
+    font-size: 13px;
+  }
+
+  .coin-info span {
+    font-size: 11px;
+  }
+
+  .coin-price {
+    font-size: 13px;
+  }
+
   .auth-card {
     padding: 25px 19px;
   }
@@ -1994,7 +2367,7 @@ footer a:hover {
 
 
 /* =========================
-   22. ACCESSIBILITÉ
+   24. ACCESSIBILITÉ
    ========================= */
 
 @media (prefers-reduced-motion: reduce) {
