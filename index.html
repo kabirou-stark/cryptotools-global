@@ -11,466 +11,1035 @@
 
   <link rel="stylesheet" href="style.css">
 
+  <!-- Supabase : bibliothèque d'authentification -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Authentification : doit être chargée avant script.js -->
+  <script src="auth.js" defer></script>
+
+  <!-- Fonctionnalités crypto existantes -->
   <script src="script.js" defer></script>
 </head>
 
 <body>
 
-  <header class="site-header">
-    <div class="container header-content">
+  <!-- ==========================================
+       PAGE DE CONNEXION ET D'INSCRIPTION
+       ========================================== -->
 
-      <a class="brand" href="#home" aria-label="CryptoTools Global accueil">
-        <span class="brand-icon">₿</span>
-        <span>CryptoTools <strong>Global</strong></span>
-      </a>
+  <section class="auth-screen" id="authScreen">
 
-      <nav class="main-nav" id="mainNav">
-        <a href="#home" data-i18n="navHome">Accueil</a>
-        <a href="#converters" data-i18n="navConverters">Convertisseurs</a>
-        <a href="#calculators" data-i18n="navCalculators">Calculateurs</a>
-        <a href="#markets" data-i18n="navMarkets">Marché</a>
-      </nav>
+    <div class="auth-card">
 
-      <div class="header-actions">
-        <label class="language-label" for="languageSelect">🌐</label>
-        <select id="languageSelect" aria-label="Language">
-          <option value="fr">FR</option>
-          <option value="en">EN</option>
-        </select>
+      <div class="auth-brand">
+        <a class="brand" href="#" aria-label="CryptoTools Global">
+          <span class="brand-icon">₿</span>
+          <span>CryptoTools <strong>Global</strong></span>
+        </a>
+      </div>
+
+      <h1 id="authTitle">Connexion</h1>
+
+      <p class="auth-subtitle" id="authSubtitle">
+        Connectez-vous pour accéder à vos outils crypto.
+      </p>
+
+      <div class="auth-tabs" role="tablist" aria-label="Compte">
 
         <button
-          class="menu-toggle"
-          id="menuToggle"
+          class="auth-tab is-active"
+          id="showLoginTab"
           type="button"
-          aria-label="Ouvrir le menu"
-          aria-expanded="false"
-        >☰</button>
+          role="tab"
+        >
+          Connexion
+        </button>
+
+        <button
+          class="auth-tab"
+          id="showSignupTab"
+          type="button"
+          role="tab"
+        >
+          Créer un compte
+        </button>
+
       </div>
+
+      <form class="auth-form" id="authForm">
+
+        <label
+          id="authNameLabel"
+          for="authName"
+          hidden
+        >
+          Nom complet
+        </label>
+
+        <input
+          id="authName"
+          type="text"
+          autocomplete="name"
+          maxlength="80"
+          placeholder="Votre nom"
+          hidden
+        >
+
+        <label for="authEmail">
+          Adresse e-mail
+        </label>
+
+        <input
+          id="authEmail"
+          type="email"
+          autocomplete="email"
+          placeholder="vous@exemple.com"
+          required
+        >
+
+        <label for="authPassword">
+          Mot de passe
+        </label>
+
+        <input
+          id="authPassword"
+          type="password"
+          autocomplete="current-password"
+          minlength="8"
+          placeholder="8 caractères minimum"
+          required
+        >
+
+        <label
+          id="authConfirmLabel"
+          for="authPasswordConfirm"
+          hidden
+        >
+          Confirmer le mot de passe
+        </label>
+
+        <input
+          id="authPasswordConfirm"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          placeholder="Répétez le mot de passe"
+          hidden
+        >
+
+        <button
+          class="button button-primary"
+          id="authSubmit"
+          type="submit"
+        >
+          Se connecter
+        </button>
+
+      </form>
+
+      <button
+        class="auth-forgot"
+        id="forgotPasswordButton"
+        type="button"
+      >
+        Mot de passe oublié ?
+      </button>
+
+      <div
+        class="auth-message"
+        id="authMessage"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+
+      <p class="auth-note">
+        CryptoTools Global fournit des estimations indicatives
+        et ne garantit aucun gain financier.
+      </p>
 
     </div>
-  </header>
 
-  <main id="home">
+  </section>
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="container hero-grid">
+  <!-- ==========================================
+       APPLICATION PROTÉGÉE PAR LA SESSION
+       Tout le site existant est dans cette div.
+       ========================================== -->
 
-        <div class="hero-content">
-          <span class="eyebrow" data-i18n="heroBadge">
-            DES OUTILS CRYPTO GRATUITS
-          </span>
+  <div id="protectedApp" hidden>
 
-          <h1 data-i18n="heroTitle">
-            La crypto, <span>plus simple.</span>
-          </h1>
+    <!-- HEADER -->
 
-          <p data-i18n="heroDescription">
-            Convertissez vos cryptomonnaies, estimez vos gains et consultez
-            les prix du marché depuis une plateforme simple et accessible.
-          </p>
+    <header class="site-header">
 
-          <div class="hero-buttons">
-            <a class="button button-primary" href="#converters" data-i18n="heroButton">
-              Commencer gratuitement
-            </a>
+      <div class="container header-content">
 
-            <a class="button button-secondary" href="#markets" data-i18n="heroMarketButton">
-              Voir les prix
-            </a>
-          </div>
-
-          <div class="hero-trust">
-            <span>✓ <span data-i18n="trustFree">Outils gratuits</span></span>
-            <span>✓ <span data-i18n="trustMobile">Adapté au mobile</span></span>
-            <span>✓ <span data-i18n="trustSimple">Simple à utiliser</span></span>
-          </div>
-        </div>
-
-        <div class="hero-visual">
-          <div class="market-preview">
-            <div class="preview-top">
-              <div>
-                <span class="muted" data-i18n="marketPreview">Aperçu du marché</span>
-                <h3>Crypto Market</h3>
-              </div>
-              <span class="live-indicator">
-                <span></span> LIVE
-              </span>
-            </div>
-
-            <div class="preview-coin">
-              <div class="coin-symbol bitcoin">₿</div>
-              <div class="coin-info">
-                <strong>Bitcoin</strong>
-                <span>BTC</span>
-              </div>
-              <div class="coin-price">
-                <strong id="heroBtcPrice">--</strong>
-                <span id="heroBtcChange">USD</span>
-              </div>
-            </div>
-
-            <div class="preview-coin">
-              <div class="coin-symbol ethereum">Ξ</div>
-              <div class="coin-info">
-                <strong>Ethereum</strong>
-                <span>ETH</span>
-              </div>
-              <div class="coin-price">
-                <strong id="heroEthPrice">--</strong>
-                <span>USD</span>
-              </div>
-            </div>
-
-            <div class="preview-coin">
-              <div class="coin-symbol solana">◎</div>
-              <div class="coin-info">
-                <strong>Solana</strong>
-                <span>SOL</span>
-              </div>
-              <div class="coin-price">
-                <strong id="heroSolPrice">--</strong>
-                <span>USD</span>
-              </div>
-            </div>
-
-            <div class="preview-footer">
-              <span>CryptoTools Global</span>
-              <span data-i18n="indicativePrices">Prix indicatifs</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- PUBLICITÉ : EMPLACEMENT PRÉVU -->
-    <section class="ad-section container" aria-label="Publicité">
-      <div class="ad-placeholder">
-        <span class="ad-label">PUBLICITÉ</span>
-        <p data-i18n="adPlaceholder">
-          Espace publicitaire — les annonces apparaîtront après configuration
-          d'un fournisseur compatible.
-        </p>
-      </div>
-    </section>
-
-    <!-- CONVERTISSEURS -->
-    <section class="section" id="converters">
-      <div class="container">
-
-        <div class="section-heading">
-          <span class="eyebrow" data-i18n="toolsEyebrow">NOS OUTILS</span>
-          <h2 data-i18n="convertersTitle">Convertisseurs crypto</h2>
-          <p data-i18n="convertersDescription">
-            Obtenez rapidement une estimation de la valeur de vos cryptomonnaies.
-          </p>
-        </div>
-
-        <div class="tools-grid">
-
-          <!-- BTC vers USDT -->
-          <article class="tool-card">
-            <div class="tool-icon">₿</div>
-            <h3 data-i18n="btcConverterTitle">Bitcoin vers USDT</h3>
-            <p class="tool-description" data-i18n="btcConverterDescription">
-              Convertissez du BTC en Tether.
-            </p>
-
-            <label for="btcAmount" data-i18n="amountLabel">Montant</label>
-            <div class="input-with-suffix">
-              <input id="btcAmount" type="number" min="0" step="any"
-                     placeholder="0.001" inputmode="decimal">
-              <span>BTC</span>
-            </div>
-
-            <button class="button button-primary full-width" id="convertBtcButton"
-                    type="button" data-i18n="convertButton">
-              Convertir
-            </button>
-
-            <div class="result-box">
-              <span data-i18n="estimatedResult">Résultat estimé</span>
-              <strong id="btcResult">-- USDT</strong>
-            </div>
-          </article>
-
-          <!-- USDT vers FCFA -->
-          <article class="tool-card featured-card">
-            <div class="featured-badge" data-i18n="popularBadge">Populaire</div>
-            <div class="tool-icon">₮</div>
-            <h3 data-i18n="usdtConverterTitle">USDT vers FCFA</h3>
-            <p class="tool-description" data-i18n="usdtConverterDescription">
-              Estimez la valeur de vos USDT en francs CFA BCEAO.
-            </p>
-
-            <label for="usdtAmount" data-i18n="amountLabel">Montant</label>
-            <div class="input-with-suffix">
-              <input id="usdtAmount" type="number" min="0" step="any"
-                     placeholder="100" inputmode="decimal">
-              <span>USDT</span>
-            </div>
-
-            <button class="button button-primary full-width" id="convertUsdtButton"
-                    type="button" data-i18n="convertButton">
-              Convertir
-            </button>
-
-            <div class="result-box">
-              <span data-i18n="estimatedResult">Résultat estimé</span>
-              <strong id="usdtResult">-- FCFA</strong>
-            </div>
-
-            <small class="exchange-note" id="usdtRateNote">
-              Taux indicatif en attente.
-            </small>
-          </article>
-
-          <!-- Crypto vers FCFA -->
-          <article class="tool-card">
-            <div class="tool-icon">⇄</div>
-            <h3 data-i18n="cryptoConverterTitle">Crypto vers FCFA</h3>
-            <p class="tool-description" data-i18n="cryptoConverterDescription">
-              Estimez la valeur d'une autre cryptomonnaie en FCFA.
-            </p>
-
-            <label for="cryptoSelect" data-i18n="cryptoLabel">Cryptomonnaie</label>
-            <select id="cryptoSelect" class="form-select">
-              <option value="bitcoin">Bitcoin (BTC)</option>
-              <option value="ethereum">Ethereum (ETH)</option>
-              <option value="binancecoin">BNB</option>
-              <option value="solana">Solana (SOL)</option>
-              <option value="tether">Tether (USDT)</option>
-            </select>
-
-            <label for="cryptoAmount" data-i18n="amountLabel">Montant</label>
-            <div class="input-with-suffix">
-              <input id="cryptoAmount" type="number" min="0" step="any"
-                     placeholder="0.01" inputmode="decimal">
-              <span id="cryptoUnit">BTC</span>
-            </div>
-
-            <button class="button button-primary full-width" id="convertCryptoButton"
-                    type="button" data-i18n="convertButton">
-              Convertir
-            </button>
-
-            <div class="result-box">
-              <span data-i18n="estimatedResult">Résultat estimé</span>
-              <strong id="cryptoResult">-- FCFA</strong>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- CALCULATEURS -->
-    <section class="section section-soft" id="calculators">
-      <div class="container">
-
-        <div class="section-heading">
-          <span class="eyebrow" data-i18n="calculatorEyebrow">CALCULS PRATIQUES</span>
-          <h2 data-i18n="calculatorsTitle">Calculateurs crypto</h2>
-          <p data-i18n="calculatorsDescription">
-            Préparez vos calculs avant une opération.
-          </p>
-        </div>
-
-        <div class="tools-grid">
-
-          <!-- Profit / perte -->
-          <article class="tool-card">
-            <div class="tool-icon">↗</div>
-            <h3 data-i18n="profitTitle">Calculateur de profits et pertes</h3>
-            <p class="tool-description" data-i18n="profitDescription">
-              Comparez votre prix d'achat à votre prix de vente.
-            </p>
-
-            <label for="buyPrice" data-i18n="buyPriceLabel">Prix d'achat (USDT)</label>
-            <input id="buyPrice" class="form-control" type="number"
-                   min="0" step="any" placeholder="100">
-
-            <label for="sellPrice" data-i18n="sellPriceLabel">Prix de vente (USDT)</label>
-            <input id="sellPrice" class="form-control" type="number"
-                   min="0" step="any" placeholder="120">
-
-            <label for="assetQuantity" data-i18n="quantityLabel">Quantité achetée</label>
-            <input id="assetQuantity" class="form-control" type="number"
-                   min="0" step="any" placeholder="1">
-
-            <button class="button button-primary full-width" id="calculateProfitButton"
-                    type="button" data-i18n="calculateButton">
-              Calculer
-            </button>
-
-            <div class="result-box">
-              <span data-i18n="profitResultLabel">Profit / perte estimé</span>
-              <strong id="profitResult">-- USDT</strong>
-              <small id="profitPercentage">-- %</small>
-            </div>
-          </article>
-
-          <!-- Frais de transaction -->
-          <article class="tool-card">
-            <div class="tool-icon">⇄</div>
-            <h3 data-i18n="feesTitle">Frais de transaction</h3>
-            <p class="tool-description" data-i18n="feesDescription">
-              Estimez les frais proportionnels d'une transaction.
-            </p>
-
-            <label for="transactionAmount" data-i18n="transactionAmountLabel">
-              Montant de la transaction (USDT)
-            </label>
-            <input id="transactionAmount" class="form-control" type="number"
-                   min="0" step="any" placeholder="100">
-
-            <label for="feeRate" data-i18n="feeRateLabel">Taux de frais (%)</label>
-            <input id="feeRate" class="form-control" type="number"
-                   min="0" step="any" placeholder="0.1">
-
-            <button class="button button-primary full-width" id="calculateFeesButton"
-                    type="button" data-i18n="calculateButton">
-              Calculer
-            </button>
-
-            <div class="result-box">
-              <span data-i18n="feesResultLabel">Frais estimés</span>
-              <strong id="feesResult">-- USDT</strong>
-              <small id="netAmountResult">--</small>
-            </div>
-
-            <small class="exchange-note" data-i18n="feesNote">
-              Les frais réels dépendent de la plateforme et du réseau utilisés.
-            </small>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- MARCHÉ -->
-    <section class="section" id="markets">
-      <div class="container">
-
-        <div class="section-heading market-heading">
-          <div>
-            <span class="eyebrow" data-i18n="marketEyebrow">SUIVI DU MARCHÉ</span>
-            <h2 data-i18n="marketTitle">Prix des cryptomonnaies</h2>
-            <p data-i18n="marketDescription">
-              Consultez les dernières données disponibles.
-            </p>
-          </div>
-
-          <button class="button button-secondary" id="refreshPricesButton"
-                  type="button" data-i18n="refreshButton">
-            ↻ Actualiser
-          </button>
-        </div>
-
-        <div class="table-wrapper">
-          <table class="market-table">
-            <thead>
-              <tr>
-                <th data-i18n="coinColumn">Actif</th>
-                <th data-i18n="priceColumn">Prix (USD)</th>
-                <th data-i18n="fcfaColumn">Prix (FCFA)</th>
-              </tr>
-            </thead>
-
-            <tbody id="marketTableBody">
-              <tr>
-                <td colspan="3" class="loading-cell" data-i18n="loadingPrices">
-                  Chargement des prix...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p class="market-updated" id="lastUpdated">
-          Données en attente de chargement.
-        </p>
-
-        <div class="market-disclaimer" data-i18n="marketDisclaimer">
-          Les cours sont indicatifs. Le prix réel peut varier selon la plateforme,
-          le pays, le réseau et les frais appliqués.
-        </div>
-
-      </div>
-    </section>
-
-    <!-- PUBLICITÉ : EMPLACEMENT PRÉVU -->
-    <section class="ad-section container" aria-label="Publicité">
-      <div class="ad-placeholder">
-        <span class="ad-label">PUBLICITÉ</span>
-        <p data-i18n="adPlaceholder">
-          Espace publicitaire — les annonces apparaîtront après configuration
-          d'un fournisseur compatible.
-        </p>
-      </div>
-    </section>
-
-    <!-- À PROPOS -->
-    <section class="section about-section" id="about">
-      <div class="container about-content">
-        <span class="eyebrow" data-i18n="aboutEyebrow">À PROPOS</span>
-        <h2 data-i18n="aboutTitle">Les outils crypto, accessibles à tous.</h2>
-        <p data-i18n="aboutDescription">
-          CryptoTools Global rassemble des outils gratuits pour aider les
-          utilisateurs à convertir des montants, comprendre les frais et estimer
-          leurs résultats. La plateforme fournit des estimations et ne garantit
-          aucun gain financier.
-        </p>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-grid">
-
-      <div class="footer-brand">
-        <a class="brand footer-logo" href="#home">
+        <a
+          class="brand"
+          href="#home"
+          aria-label="CryptoTools Global accueil"
+        >
           <span class="brand-icon">₿</span>
           <span>CryptoTools <strong>Global</strong></span>
         </a>
 
-        <p data-i18n="footerDescription">
-          Des outils crypto simples, gratuits et accessibles.
+        <nav class="main-nav" id="mainNav">
+
+          <a href="#home" data-i18n="navHome">
+            Accueil
+          </a>
+
+          <a href="#converters" data-i18n="navConverters">
+            Convertisseurs
+          </a>
+
+          <a href="#calculators" data-i18n="navCalculators">
+            Calculateurs
+          </a>
+
+          <a href="#markets" data-i18n="navMarkets">
+            Marché
+          </a>
+
+        </nav>
+
+        <div class="header-actions">
+
+          <label class="language-label" for="languageSelect">
+            🌐
+          </label>
+
+          <select id="languageSelect" aria-label="Language">
+            <option value="fr">FR</option>
+            <option value="en">EN</option>
+          </select>
+
+          <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="Ouvrir le menu"
+            aria-expanded="false"
+          >☰</button>
+
+          <!-- Le bouton Déconnexion est ajouté par auth.js -->
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- CONTENU PRINCIPAL -->
+
+    <main id="home">
+
+      <!-- HERO -->
+
+      <section class="hero">
+
+        <div class="container hero-grid">
+
+          <div class="hero-content">
+
+            <span class="eyebrow" data-i18n="heroBadge">
+              DES OUTILS CRYPTO GRATUITS
+            </span>
+
+            <h1 data-i18n="heroTitle">
+              La crypto, <span>plus simple.</span>
+            </h1>
+
+            <p data-i18n="heroDescription">
+              Convertissez vos cryptomonnaies, estimez vos gains et consultez
+              les prix du marché depuis une plateforme simple et accessible.
+            </p>
+
+            <div class="hero-buttons">
+
+              <a
+                class="button button-primary"
+                href="#converters"
+                data-i18n="heroButton"
+              >
+                Commencer gratuitement
+              </a>
+
+              <a
+                class="button button-secondary"
+                href="#markets"
+                data-i18n="heroMarketButton"
+              >
+                Voir les prix
+              </a>
+
+            </div>
+
+            <div class="hero-trust">
+
+              <span>
+                ✓ <span data-i18n="trustFree">Outils gratuits</span>
+              </span>
+
+              <span>
+                ✓ <span data-i18n="trustMobile">Adapté au mobile</span>
+              </span>
+
+              <span>
+                ✓ <span data-i18n="trustSimple">Simple à utiliser</span>
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="hero-visual">
+
+            <div class="market-preview">
+
+              <div class="preview-top">
+
+                <div>
+                  <span class="muted" data-i18n="marketPreview">
+                    Aperçu du marché
+                  </span>
+
+                  <h3>Crypto Market</h3>
+                </div>
+
+                <span class="live-indicator">
+                  <span></span> LIVE
+                </span>
+
+              </div>
+
+              <div class="preview-coin">
+
+                <div class="coin-symbol bitcoin">₿</div>
+
+                <div class="coin-info">
+                  <strong>Bitcoin</strong>
+                  <span>BTC</span>
+                </div>
+
+                <div class="coin-price">
+                  <strong id="heroBtcPrice">--</strong>
+                  <span id="heroBtcChange">USD</span>
+                </div>
+
+              </div>
+
+              <div class="preview-coin">
+
+                <div class="coin-symbol ethereum">Ξ</div>
+
+                <div class="coin-info">
+                  <strong>Ethereum</strong>
+                  <span>ETH</span>
+                </div>
+
+                <div class="coin-price">
+                  <strong id="heroEthPrice">--</strong>
+                  <span>USD</span>
+                </div>
+
+              </div>
+
+              <div class="preview-coin">
+
+                <div class="coin-symbol solana">◎</div>
+
+                <div class="coin-info">
+                  <strong>Solana</strong>
+                  <span>SOL</span>
+                </div>
+
+                <div class="coin-price">
+                  <strong id="heroSolPrice">--</strong>
+                  <span>USD</span>
+                </div>
+
+              </div>
+
+              <div class="preview-footer">
+                <span>CryptoTools Global</span>
+                <span data-i18n="indicativePrices">
+                  Prix indicatifs
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- PUBLICITÉ -->
+
+      <section
+        class="ad-section container"
+        aria-label="Publicité"
+      >
+
+        <div class="ad-placeholder">
+
+          <span class="ad-label">PUBLICITÉ</span>
+
+          <p data-i18n="adPlaceholder">
+            Espace publicitaire — les annonces apparaîtront après configuration
+            d'un fournisseur compatible.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- CONVERTISSEURS -->
+
+      <section class="section" id="converters">
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <span class="eyebrow" data-i18n="toolsEyebrow">
+              NOS OUTILS
+            </span>
+
+            <h2 data-i18n="convertersTitle">
+              Convertisseurs crypto
+            </h2>
+
+            <p data-i18n="convertersDescription">
+              Obtenez rapidement une estimation de la valeur de vos cryptomonnaies.
+            </p>
+
+          </div>
+
+          <div class="tools-grid">
+
+            <!-- BTC vers USDT -->
+
+            <article class="tool-card">
+
+              <div class="tool-icon">₿</div>
+
+              <h3 data-i18n="btcConverterTitle">
+                Bitcoin vers USDT
+              </h3>
+
+              <p
+                class="tool-description"
+                data-i18n="btcConverterDescription"
+              >
+                Convertissez du BTC en Tether.
+              </p>
+
+              <label for="btcAmount" data-i18n="amountLabel">
+                Montant
+              </label>
+
+              <div class="input-with-suffix">
+
+                <input
+                  id="btcAmount"
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="0.001"
+                  inputmode="decimal"
+                >
+
+                <span>BTC</span>
+
+              </div>
+
+              <button
+                class="button button-primary full-width"
+                id="convertBtcButton"
+                type="button"
+                data-i18n="convertButton"
+              >
+                Convertir
+              </button>
+
+              <div class="result-box">
+
+                <span data-i18n="estimatedResult">
+                  Résultat estimé
+                </span>
+
+                <strong id="btcResult">-- USDT</strong>
+
+              </div>
+
+            </article>
+
+            <!-- USDT vers FCFA -->
+
+            <article class="tool-card featured-card">
+
+              <div
+                class="featured-badge"
+                data-i18n="popularBadge"
+              >
+                Populaire
+              </div>
+
+              <div class="tool-icon">₮</div>
+
+              <h3 data-i18n="usdtConverterTitle">
+                USDT vers FCFA
+              </h3>
+
+              <p
+                class="tool-description"
+                data-i18n="usdtConverterDescription"
+              >
+                Estimez la valeur de vos USDT en francs CFA BCEAO.
+              </p>
+
+              <label for="usdtAmount" data-i18n="amountLabel">
+                Montant
+              </label>
+
+              <div class="input-with-suffix">
+
+                <input
+                  id="usdtAmount"
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="100"
+                  inputmode="decimal"
+                >
+
+                <span>USDT</span>
+
+              </div>
+
+              <button
+                class="button button-primary full-width"
+                id="convertUsdtButton"
+                type="button"
+                data-i18n="convertButton"
+              >
+                Convertir
+              </button>
+
+              <div class="result-box">
+
+                <span data-i18n="estimatedResult">
+                  Résultat estimé
+                </span>
+
+                <strong id="usdtResult">-- FCFA</strong>
+
+              </div>
+
+              <small
+                class="exchange-note"
+                id="usdtRateNote"
+              >
+                Taux indicatif en attente.
+              </small>
+
+            </article>
+
+            <!-- Crypto vers FCFA -->
+
+            <article class="tool-card">
+
+              <div class="tool-icon">⇄</div>
+
+              <h3 data-i18n="cryptoConverterTitle">
+                Crypto vers FCFA
+              </h3>
+
+              <p
+                class="tool-description"
+                data-i18n="cryptoConverterDescription"
+              >
+                Estimez la valeur d'une autre cryptomonnaie en FCFA.
+              </p>
+
+              <label for="cryptoSelect" data-i18n="cryptoLabel">
+                Cryptomonnaie
+              </label>
+
+              <select
+                id="cryptoSelect"
+                class="form-select"
+              >
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+                <option value="binancecoin">BNB</option>
+                <option value="solana">Solana (SOL)</option>
+                <option value="tether">Tether (USDT)</option>
+              </select>
+
+              <label for="cryptoAmount" data-i18n="amountLabel">
+                Montant
+              </label>
+
+              <div class="input-with-suffix">
+
+                <input
+                  id="cryptoAmount"
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="0.01"
+                  inputmode="decimal"
+                >
+
+                <span id="cryptoUnit">BTC</span>
+
+              </div>
+
+              <button
+                class="button button-primary full-width"
+                id="convertCryptoButton"
+                type="button"
+                data-i18n="convertButton"
+              >
+                Convertir
+              </button>
+
+              <div class="result-box">
+
+                <span data-i18n="estimatedResult">
+                  Résultat estimé
+                </span>
+
+                <strong id="cryptoResult">-- FCFA</strong>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- CALCULATEURS -->
+
+      <section
+        class="section section-soft"
+        id="calculators"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <span
+              class="eyebrow"
+              data-i18n="calculatorEyebrow"
+            >
+              CALCULS PRATIQUES
+            </span>
+
+            <h2 data-i18n="calculatorsTitle">
+              Calculateurs crypto
+            </h2>
+
+            <p data-i18n="calculatorsDescription">
+              Préparez vos calculs avant une opération.
+            </p>
+
+          </div>
+
+          <div class="tools-grid">
+
+            <!-- PROFIT ET PERTE -->
+
+            <article class="tool-card">
+
+              <div class="tool-icon">↗</div>
+
+              <h3 data-i18n="profitTitle">
+                Calculateur de profits et pertes
+              </h3>
+
+              <p
+                class="tool-description"
+                data-i18n="profitDescription"
+              >
+                Comparez votre prix d'achat à votre prix de vente.
+              </p>
+
+              <label for="buyPrice" data-i18n="buyPriceLabel">
+                Prix d'achat (USDT)
+              </label>
+
+              <input
+                id="buyPrice"
+                class="form-control"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="100"
+              >
+
+              <label for="sellPrice" data-i18n="sellPriceLabel">
+                Prix de vente (USDT)
+              </label>
+
+              <input
+                id="sellPrice"
+                class="form-control"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="120"
+              >
+
+              <label for="assetQuantity" data-i18n="quantityLabel">
+                Quantité achetée
+              </label>
+
+              <input
+                id="assetQuantity"
+                class="form-control"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="1"
+              >
+
+              <button
+                class="button button-primary full-width"
+                id="calculateProfitButton"
+                type="button"
+                data-i18n="calculateButton"
+              >
+                Calculer
+              </button>
+
+              <div class="result-box">
+
+                <span data-i18n="profitResultLabel">
+                  Profit / perte estimé
+                </span>
+
+                <strong id="profitResult">-- USDT</strong>
+
+                <small id="profitPercentage">-- %</small>
+
+              </div>
+
+            </article>
+
+            <!-- FRAIS DE TRANSACTION -->
+
+            <article class="tool-card">
+
+              <div class="tool-icon">⇄</div>
+
+              <h3 data-i18n="feesTitle">
+                Frais de transaction
+              </h3>
+
+              <p
+                class="tool-description"
+                data-i18n="feesDescription"
+              >
+                Estimez les frais proportionnels d'une transaction.
+              </p>
+
+              <label
+                for="transactionAmount"
+                data-i18n="transactionAmountLabel"
+              >
+                Montant de la transaction (USDT)
+              </label>
+
+              <input
+                id="transactionAmount"
+                class="form-control"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="100"
+              >
+
+              <label for="feeRate" data-i18n="feeRateLabel">
+                Taux de frais (%)
+              </label>
+
+              <input
+                id="feeRate"
+                class="form-control"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="0.1"
+              >
+
+              <button
+                class="button button-primary full-width"
+                id="calculateFeesButton"
+                type="button"
+                data-i18n="calculateButton"
+              >
+                Calculer
+              </button>
+
+              <div class="result-box">
+
+                <span data-i18n="feesResultLabel">
+                  Frais estimés
+                </span>
+
+                <strong id="feesResult">-- USDT</strong>
+
+                <small id="netAmountResult">--</small>
+
+              </div>
+
+              <small
+                class="exchange-note"
+                data-i18n="feesNote"
+              >
+                Les frais réels dépendent de la plateforme et du réseau utilisés.
+              </small>
+
+            </article>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- MARCHÉ CRYPTO -->
+
+      <section class="section" id="markets">
+
+        <div class="container">
+
+          <div class="section-heading market-heading">
+
+            <div>
+
+              <span
+                class="eyebrow"
+                data-i18n="marketEyebrow"
+              >
+                SUIVI DU MARCHÉ
+              </span>
+
+              <h2 data-i18n="marketTitle">
+                Prix des cryptomonnaies
+              </h2>
+
+              <p data-i18n="marketDescription">
+                Consultez les dernières données disponibles.
+              </p>
+
+            </div>
+
+            <button
+              class="button button-secondary"
+              id="refreshPricesButton"
+              type="button"
+              data-i18n="refreshButton"
+            >
+              ↻ Actualiser
+            </button>
+
+          </div>
+
+          <div class="table-wrapper">
+
+            <table class="market-table">
+
+              <thead>
+                <tr>
+                  <th data-i18n="coinColumn">Actif</th>
+                  <th data-i18n="priceColumn">Prix (USD)</th>
+                  <th data-i18n="fcfaColumn">Prix (FCFA)</th>
+                </tr>
+              </thead>
+
+              <tbody id="marketTableBody">
+
+                <tr>
+                  <td
+                    colspan="3"
+                    class="loading-cell"
+                    data-i18n="loadingPrices"
+                  >
+                    Chargement des prix...
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <p class="market-updated" id="lastUpdated">
+            Données en attente de chargement.
+          </p>
+
+          <div
+            class="market-disclaimer"
+            data-i18n="marketDisclaimer"
+          >
+            Les cours sont indicatifs. Le prix réel peut varier selon la plateforme,
+            le pays, le réseau et les frais appliqués.
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- DEUXIÈME EMPLACEMENT PUBLICITAIRE -->
+
+      <section
+        class="ad-section container"
+        aria-label="Publicité"
+      >
+
+        <div class="ad-placeholder">
+
+          <span class="ad-label">PUBLICITÉ</span>
+
+          <p data-i18n="adPlaceholder">
+            Espace publicitaire — les annonces apparaîtront après configuration
+            d'un fournisseur compatible.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- À PROPOS -->
+
+      <section class="section about-section" id="about">
+
+        <div class="container about-content">
+
+          <span class="eyebrow" data-i18n="aboutEyebrow">
+            À PROPOS
+          </span>
+
+          <h2 data-i18n="aboutTitle">
+            Les outils crypto, accessibles à tous.
+          </h2>
+
+          <p data-i18n="aboutDescription">
+            CryptoTools Global rassemble des outils gratuits pour aider les
+            utilisateurs à convertir des montants, comprendre les frais et estimer
+            leurs résultats. La plateforme fournit des estimations et ne garantit
+            aucun gain financier.
+          </p>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+
+      <div class="container footer-grid">
+
+        <div class="footer-brand">
+
+          <a class="brand footer-logo" href="#home">
+
+            <span class="brand-icon">₿</span>
+
+            <span>
+              CryptoTools <strong>Global</strong>
+            </span>
+
+          </a>
+
+          <p data-i18n="footerDescription">
+            Des outils crypto simples, gratuits et accessibles.
+          </p>
+
+        </div>
+
+        <div class="footer-links">
+
+          <h4 data-i18n="footerNavigation">
+            Navigation
+          </h4>
+
+          <a href="#converters" data-i18n="navConverters">
+            Convertisseurs
+          </a>
+
+          <a href="#calculators" data-i18n="navCalculators">
+            Calculateurs
+          </a>
+
+          <a href="#markets" data-i18n="navMarkets">
+            Marché
+          </a>
+
+        </div>
+
+        <div class="footer-links">
+
+          <h4 data-i18n="footerInformation">
+            Informations
+          </h4>
+
+          <a href="#about" data-i18n="footerAbout">
+            À propos
+          </a>
+
+          <a href="#disclaimer" data-i18n="footerDisclaimer">
+            Avertissement
+          </a>
+
+        </div>
+
+      </div>
+
+      <div class="container footer-bottom">
+
+        <p>
+          © <span id="currentYear"></span> CryptoTools Global.
+
+          <span data-i18n="rightsReserved">
+            Tous droits réservés.
+          </span>
         </p>
+
+        <p data-i18n="footerDisclaimerText">
+          Les informations fournies sont indicatives et ne constituent pas
+          des conseils financiers.
+        </p>
+
       </div>
 
-      <div class="footer-links">
-        <h4 data-i18n="footerNavigation">Navigation</h4>
-        <a href="#converters" data-i18n="navConverters">Convertisseurs</a>
-        <a href="#calculators" data-i18n="navCalculators">Calculateurs</a>
-        <a href="#markets" data-i18n="navMarkets">Marché</a>
-      </div>
+    </footer>
 
-      <div class="footer-links">
-        <h4 data-i18n="footerInformation">Informations</h4>
-        <a href="#about" data-i18n="footerAbout">À propos</a>
-        <a href="#disclaimer" data-i18n="footerDisclaimer">Avertissement</a>
-      </div>
+    <!-- NOTIFICATIONS -->
 
-    </div>
+    <div
+      class="toast"
+      id="toast"
+      role="status"
+      aria-live="polite"
+    ></div>
 
-    <div class="container footer-bottom">
-      <p>
-        © <span id="currentYear"></span> CryptoTools Global.
-        <span data-i18n="rightsReserved">Tous droits réservés.</span>
-      </p>
-      <p data-i18n="footerDisclaimerText">
-        Les informations fournies sont indicatives et ne constituent pas
-        des conseils financiers.
-      </p>
-    </div>
-  </footer>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
 
 </body>
 </html>
