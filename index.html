@@ -5,10 +5,235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#10264a">
   <meta name="description" content="CryptoTools Global : convertisseurs de cryptomonnaies, conversion USDT en FCFA, calculateur de profits et frais de transaction.">
+  <meta name="color-scheme" content="light">
   <title>CryptoTools Global | Crypto Tools &amp; Converters</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Supabase v2 : initialisé dans auth.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- defer garantit que le HTML est analysé avant l'exécution -->
+  <script src="./auth.js" defer></script>
+  <script src="./script.js" defer></script>
 
   <style>
+    [hidden] {
+      display: none !important;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .65;
+    }
+
+    .auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      box-sizing: border-box;
+      background: #f1f5f9;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 30px;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid #dbeafe;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(15, 38, 74, .12);
+    }
+
+    .auth-brand {
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #10264a;
+      text-decoration: none;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .brand-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      color: white;
+      background: #155eef;
+      border-radius: 12px;
+      font-size: 23px;
+    }
+
+    .auth-card h1 {
+      margin: 0 0 8px;
+      color: #10264a;
+      font-size: 29px;
+    }
+
+    .auth-subtitle {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 22px 0;
+      padding: 5px;
+      background: #f1f5f9;
+      border-radius: 12px;
+    }
+
+    .auth-tab {
+      padding: 12px 8px;
+      color: #475569;
+      background: transparent;
+      border: 0;
+      border-radius: 9px;
+      font-weight: 700;
+    }
+
+    .auth-tab.is-active {
+      color: #155eef;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(15, 38, 74, .08);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-form label,
+    .tool-card label {
+      margin-top: 5px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .auth-form input,
+    .form-control,
+    .form-select,
+    .input-with-suffix input,
+    #languageSelect {
+      width: 100%;
+      min-height: 45px;
+      padding: 11px 12px;
+      box-sizing: border-box;
+      color: #10264a;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .auth-form input:focus,
+    .form-control:focus,
+    .form-select:focus,
+    .input-with-suffix input:focus {
+      border-color: #155eef;
+      box-shadow: 0 0 0 3px rgba(21, 94, 239, .12);
+    }
+
+    .button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 11px 16px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button-primary {
+      color: #fff;
+      background: #155eef;
+      border-color: #155eef;
+    }
+
+    .button-secondary {
+      color: #155eef;
+      background: #fff;
+      border-color: #bfdbfe;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .auth-form .button {
+      margin-top: 12px;
+    }
+
+    .auth-forgot {
+      display: block;
+      margin: 15px auto 0;
+      padding: 8px;
+      color: #155eef;
+      background: transparent;
+      border: 0;
+      font-weight: 600;
+    }
+
+    .auth-message {
+      margin-top: 15px;
+      padding: 12px;
+      color: #10264a;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .auth-note {
+      margin: 22px 0 0;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
     .global-trading-visual {
       position: relative;
       isolation: isolate;
@@ -203,6 +428,7 @@
       height: 125px;
       padding: 10px;
       overflow: hidden;
+      box-sizing: border-box;
       background: linear-gradient(145deg, #08172f, #12315a);
       border: 3px solid #bfdbfe;
       border-bottom-width: 8px;
@@ -365,6 +591,10 @@
     }
 
     @media (max-width: 760px) {
+      .auth-card {
+        padding: 24px 20px;
+      }
+
       .global-trading-visual {
         display: block;
         min-height: 570px;
@@ -465,19 +695,20 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .floating-crypto {
-        animation: none;
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
       }
     }
   </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="auth.js" defer></script>
-  <script src="script.js" defer></script>
 </head>
 
 <body>
-  <!-- CONNEXION ET INSCRIPTION -->
+  <!-- ÉCRAN DE CONNEXION -->
   <section class="auth-screen" id="authScreen">
     <div class="auth-card">
       <div class="auth-brand">
@@ -566,7 +797,7 @@
     </div>
   </section>
 
-  <!-- APPLICATION PROTÉGÉE -->
+  <!-- APPLICATION -->
   <div id="protectedApp" hidden>
     <header class="site-header">
       <div class="container header-content">
@@ -602,17 +833,12 @@
     </header>
 
     <main id="home">
-      <!-- ACCUEIL -->
       <section class="hero" id="homeHero">
         <div class="container hero-grid">
           <div class="hero-content">
-            <span class="eyebrow" data-i18n="heroBadge">
-              DES OUTILS CRYPTO GRATUITS
-            </span>
+            <span class="eyebrow" data-i18n="heroBadge">DES OUTILS CRYPTO GRATUITS</span>
 
-            <h1 data-i18n="heroTitle">
-              La crypto, <span>plus simple.</span>
-            </h1>
+            <h1 data-i18n="heroTitle">La crypto, <span>plus simple.</span></h1>
 
             <p data-i18n="heroDescription">
               Convertissez vos cryptomonnaies, estimez vos gains et consultez
@@ -690,7 +916,6 @@
         </div>
       </section>
 
-      <!-- PUBLICITÉ -->
       <section class="ad-section container" aria-label="Publicité">
         <div class="ad-placeholder">
           <span class="ad-label">PUBLICITÉ</span>
@@ -701,7 +926,6 @@
         </div>
       </section>
 
-      <!-- CONVERTISSEURS -->
       <section class="section" id="converters">
         <div class="container">
           <div class="section-heading">
@@ -716,9 +940,7 @@
             <article class="tool-card">
               <div class="tool-icon">₿</div>
               <h3 data-i18n="btcConverterTitle">Bitcoin vers USDT</h3>
-              <p class="tool-description" data-i18n="btcConverterDescription">
-                Convertissez du BTC en Tether.
-              </p>
+              <p class="tool-description" data-i18n="btcConverterDescription">Convertissez du BTC en Tether.</p>
 
               <label for="btcAmount" data-i18n="amountLabel">Montant</label>
               <div class="input-with-suffix">
@@ -726,9 +948,7 @@
                 <span>BTC</span>
               </div>
 
-              <button class="button button-primary full-width" id="convertBtcButton" type="button" data-i18n="convertButton">
-                Convertir
-              </button>
+              <button class="button button-primary full-width" id="convertBtcButton" type="button" data-i18n="convertButton">Convertir</button>
 
               <div class="result-box">
                 <span data-i18n="estimatedResult">Résultat estimé</span>
@@ -740,9 +960,7 @@
               <div class="featured-badge" data-i18n="popularBadge">Populaire</div>
               <div class="tool-icon">₮</div>
               <h3 data-i18n="usdtConverterTitle">USDT vers FCFA</h3>
-              <p class="tool-description" data-i18n="usdtConverterDescription">
-                Estimez la valeur de vos USDT en francs CFA BCEAO.
-              </p>
+              <p class="tool-description" data-i18n="usdtConverterDescription">Estimez la valeur de vos USDT en francs CFA BCEAO.</p>
 
               <label for="usdtAmount" data-i18n="amountLabel">Montant</label>
               <div class="input-with-suffix">
@@ -750,9 +968,7 @@
                 <span>USDT</span>
               </div>
 
-              <button class="button button-primary full-width" id="convertUsdtButton" type="button" data-i18n="convertButton">
-                Convertir
-              </button>
+              <button class="button button-primary full-width" id="convertUsdtButton" type="button" data-i18n="convertButton">Convertir</button>
 
               <div class="result-box">
                 <span data-i18n="estimatedResult">Résultat estimé</span>
@@ -765,9 +981,7 @@
             <article class="tool-card">
               <div class="tool-icon">⇄</div>
               <h3 data-i18n="cryptoConverterTitle">Crypto vers FCFA</h3>
-              <p class="tool-description" data-i18n="cryptoConverterDescription">
-                Estimez la valeur d'une autre cryptomonnaie en FCFA.
-              </p>
+              <p class="tool-description" data-i18n="cryptoConverterDescription">Estimez la valeur d'une autre cryptomonnaie en FCFA.</p>
 
               <label for="cryptoSelect" data-i18n="cryptoLabel">Cryptomonnaie</label>
               <select id="cryptoSelect" class="form-select">
@@ -784,9 +998,7 @@
                 <span id="cryptoUnit">BTC</span>
               </div>
 
-              <button class="button button-primary full-width" id="convertCryptoButton" type="button" data-i18n="convertButton">
-                Convertir
-              </button>
+              <button class="button button-primary full-width" id="convertCryptoButton" type="button" data-i18n="convertButton">Convertir</button>
 
               <div class="result-box">
                 <span data-i18n="estimatedResult">Résultat estimé</span>
@@ -797,24 +1009,19 @@
         </div>
       </section>
 
-      <!-- CALCULATEURS -->
       <section class="section section-soft" id="calculators">
         <div class="container">
           <div class="section-heading">
             <span class="eyebrow" data-i18n="calculatorEyebrow">CALCULS PRATIQUES</span>
             <h2 data-i18n="calculatorsTitle">Calculateurs crypto</h2>
-            <p data-i18n="calculatorsDescription">
-              Préparez vos calculs avant une opération.
-            </p>
+            <p data-i18n="calculatorsDescription">Préparez vos calculs avant une opération.</p>
           </div>
 
           <div class="tools-grid">
             <article class="tool-card">
               <div class="tool-icon">↗</div>
               <h3 data-i18n="profitTitle">Calculateur de profits et pertes</h3>
-              <p class="tool-description" data-i18n="profitDescription">
-                Comparez votre prix d'achat à votre prix de vente.
-              </p>
+              <p class="tool-description" data-i18n="profitDescription">Comparez votre prix d'achat à votre prix de vente.</p>
 
               <label for="buyPrice" data-i18n="buyPriceLabel">Prix d'achat (USDT)</label>
               <input id="buyPrice" class="form-control" type="number" min="0" step="any" placeholder="100">
@@ -825,9 +1032,7 @@
               <label for="assetQuantity" data-i18n="quantityLabel">Quantité achetée</label>
               <input id="assetQuantity" class="form-control" type="number" min="0" step="any" placeholder="1">
 
-              <button class="button button-primary full-width" id="calculateProfitButton" type="button" data-i18n="calculateButton">
-                Calculer
-              </button>
+              <button class="button button-primary full-width" id="calculateProfitButton" type="button" data-i18n="calculateButton">Calculer</button>
 
               <div class="result-box">
                 <span data-i18n="profitResultLabel">Profit / perte estimé</span>
@@ -839,21 +1044,15 @@
             <article class="tool-card">
               <div class="tool-icon">⇄</div>
               <h3 data-i18n="feesTitle">Frais de transaction</h3>
-              <p class="tool-description" data-i18n="feesDescription">
-                Estimez les frais proportionnels d'une transaction.
-              </p>
+              <p class="tool-description" data-i18n="feesDescription">Estimez les frais proportionnels d'une transaction.</p>
 
-              <label for="transactionAmount" data-i18n="transactionAmountLabel">
-                Montant de la transaction (USDT)
-              </label>
+              <label for="transactionAmount" data-i18n="transactionAmountLabel">Montant de la transaction (USDT)</label>
               <input id="transactionAmount" class="form-control" type="number" min="0" step="any" placeholder="100">
 
               <label for="feeRate" data-i18n="feeRateLabel">Taux de frais (%)</label>
               <input id="feeRate" class="form-control" type="number" min="0" step="any" placeholder="0.1">
 
-              <button class="button button-primary full-width" id="calculateFeesButton" type="button" data-i18n="calculateButton">
-                Calculer
-              </button>
+              <button class="button button-primary full-width" id="calculateFeesButton" type="button" data-i18n="calculateButton">Calculer</button>
 
               <div class="result-box">
                 <span data-i18n="feesResultLabel">Frais estimés</span>
@@ -861,32 +1060,24 @@
                 <small id="netAmountResult">--</small>
               </div>
 
-              <small class="exchange-note" data-i18n="feesNote">
-                Les frais réels dépendent de la plateforme et du réseau utilisés.
-              </small>
+              <small class="exchange-note" data-i18n="feesNote">Les frais réels dépendent de la plateforme et du réseau utilisés.</small>
             </article>
           </div>
         </div>
       </section>
 
-      <!-- MARCHÉ CRYPTO -->
       <section class="section" id="markets">
         <div class="container">
           <div class="section-heading market-heading">
             <div>
               <span class="eyebrow" data-i18n="marketEyebrow">SUIVI DU MARCHÉ</span>
               <h2 data-i18n="marketTitle">Prix des cryptomonnaies</h2>
-              <p data-i18n="marketDescription">
-                Consultez les dernières données disponibles.
-              </p>
+              <p data-i18n="marketDescription">Consultez les dernières données disponibles.</p>
             </div>
 
-            <button class="button button-secondary" id="refreshPricesButton" type="button" data-i18n="refreshButton">
-              ↻ Actualiser
-            </button>
+            <button class="button button-secondary" id="refreshPricesButton" type="button" data-i18n="refreshButton">↻ Actualiser</button>
           </div>
 
-          <!-- BANDEAU TRADER ET GLOBE -->
           <div
             class="global-trading-visual"
             role="img"
@@ -925,20 +1116,9 @@
             </div>
 
             <div class="visual-copy">
-              <span class="visual-kicker">
-                <span class="visual-live-dot"></span>
-                MARCHÉS MONDIAUX
-              </span>
-
-              <h3>
-                Le monde de la crypto,<br>
-                <span>en un seul regard.</span>
-              </h3>
-
-              <p>
-                Suivez les cours des cryptomonnaies et explorez les marchés
-                numériques depuis une seule plateforme.
-              </p>
+              <span class="visual-kicker"><span class="visual-live-dot"></span>MARCHÉS MONDIAUX</span>
+              <h3>Le monde de la crypto,<br><span>en un seul regard.</span></h3>
+              <p>Suivez les cours des cryptomonnaies et explorez les marchés numériques depuis une seule plateforme.</p>
 
               <div class="visual-stats">
                 <span><b>₿</b> Bitcoin</span>
@@ -955,38 +1135,16 @@
               <div class="scene-monitor monitor-left">
                 <div class="monitor-label">BTC / USDT</div>
                 <svg viewBox="0 0 150 70">
-                  <path
-                    d="M2 58L22 43 35 49 50 24 65 35 80 17 98 29 115 12 130 22 148 5"
-                    fill="none"
-                    stroke="#60a5fa"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ></path>
-                  <path
-                    d="M2 58L22 43 35 49 50 24 65 35 80 17 98 29 115 12 130 22 148 5V70H2Z"
-                    fill="#3b82f6"
-                    fill-opacity=".12"
-                  ></path>
+                  <path d="M2 58L22 43 35 49 50 24 65 35 80 17 98 29 115 12 130 22 148 5" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M2 58L22 43 35 49 50 24 65 35 80 17 98 29 115 12 130 22 148 5V70H2Z" fill="#3b82f6" fill-opacity=".12"></path>
                 </svg>
               </div>
 
               <div class="scene-monitor monitor-right">
                 <div class="monitor-label">GLOBAL MARKET</div>
                 <svg viewBox="0 0 150 70">
-                  <path
-                    d="M2 12L20 22 36 17 52 38 68 28 83 48 102 36 120 51 148 30"
-                    fill="none"
-                    stroke="#38bdf8"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ></path>
-                  <path
-                    d="M2 12L20 22 36 17 52 38 68 28 83 48 102 36 120 51 148 30V70H2Z"
-                    fill="#38bdf8"
-                    fill-opacity=".12"
-                  ></path>
+                  <path d="M2 12L20 22 36 17 52 38 68 28 83 48 102 36 120 51 148 30" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M2 12L20 22 36 17 52 38 68 28 83 48 102 36 120 51 148 30V70H2Z" fill="#38bdf8" fill-opacity=".12"></path>
                 </svg>
               </div>
 
@@ -1005,7 +1163,6 @@
               <span>CRYPTO • MARCHÉS • CONVERSION</span>
             </div>
           </div>
-          <!-- FIN DU BANDEAU -->
 
           <div class="table-wrapper">
             <table class="market-table">
@@ -1019,17 +1176,13 @@
 
               <tbody id="marketTableBody">
                 <tr>
-                  <td colspan="3" class="loading-cell" data-i18n="loadingPrices">
-                    Chargement des prix...
-                  </td>
+                  <td colspan="3" class="loading-cell" data-i18n="loadingPrices">Chargement des prix...</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <p class="market-updated" id="lastUpdated">
-            Données en attente de chargement.
-          </p>
+          <p class="market-updated" id="lastUpdated">Données en attente de chargement.</p>
 
           <div class="market-disclaimer" data-i18n="marketDisclaimer">
             Les cours sont indicatifs. Le prix réel peut varier selon la plateforme,
@@ -1038,50 +1191,37 @@
         </div>
       </section>
 
-      <!-- DEUXIÈME ESPACE PUBLICITAIRE -->
       <section class="ad-section container" aria-label="Publicité">
         <div class="ad-placeholder">
           <span class="ad-label">PUBLICITÉ</span>
-          <p data-i18n="adPlaceholder">
-            Espace publicitaire — les annonces apparaîtront après configuration
-            d'un fournisseur compatible.
-          </p>
+          <p data-i18n="adPlaceholder">Espace publicitaire — les annonces apparaîtront après configuration d'un fournisseur compatible.</p>
         </div>
       </section>
 
-      <!-- À PROPOS -->
       <section class="section about-section" id="about">
         <div class="container about-content">
           <span class="eyebrow" data-i18n="aboutEyebrow">À PROPOS</span>
-
-          <h2 data-i18n="aboutTitle">
-            Les outils crypto, accessibles à tous.
-          </h2>
-
+          <h2 data-i18n="aboutTitle">Les outils crypto, accessibles à tous.</h2>
           <p data-i18n="aboutDescription">
-            CryptoTools Global rassemble des outils gratuits pour aider les
-            utilisateurs à convertir des montants, comprendre les frais et estimer
-            leurs résultats. La plateforme fournit des estimations et ne garantit
-            aucun gain financier.
+            CryptoTools Global rassemble des outils gratuits pour aider les utilisateurs
+            à convertir des montants, comprendre les frais et estimer leurs résultats.
+            La plateforme fournit des estimations et ne garantit aucun gain financier.
           </p>
         </div>
       </section>
 
-      <!-- AVERTISSEMENT -->
       <section class="section" id="disclaimer">
         <div class="container">
           <div class="market-disclaimer">
             <strong data-i18n="footerDisclaimer">Avertissement</strong>
             <p data-i18n="footerDisclaimerText">
-              Les informations fournies sont indicatives et ne constituent pas
-              des conseils financiers.
+              Les informations fournies sont indicatives et ne constituent pas des conseils financiers.
             </p>
           </div>
         </div>
       </section>
     </main>
 
-    <!-- FOOTER -->
     <footer class="site-footer">
       <div class="container footer-grid">
         <div class="footer-brand">
@@ -1089,10 +1229,7 @@
             <span class="brand-icon">₿</span>
             <span>CryptoTools <strong>Global</strong></span>
           </a>
-
-          <p data-i18n="footerDescription">
-            Des outils crypto simples, gratuits et accessibles.
-          </p>
+          <p data-i18n="footerDescription">Des outils crypto simples, gratuits et accessibles.</p>
         </div>
 
         <div class="footer-links">
@@ -1110,20 +1247,22 @@
       </div>
 
       <div class="container footer-bottom">
-        <p>
-          © <span id="currentYear"></span> CryptoTools Global.
-          <span data-i18n="rightsReserved">Tous droits réservés.</span>
-        </p>
-
-        <p data-i18n="footerDisclaimerText">
-          Les informations fournies sont indicatives et ne constituent pas
-          des conseils financiers.
-        </p>
+        <p>© <span id="currentYear"></span> CryptoTools Global. <span data-i18n="rightsReserved">Tous droits réservés.</span></p>
+        <p data-i18n="footerDisclaimerText">Les informations fournies sont indicatives et ne constituent pas des conseils financiers.</p>
       </div>
     </footer>
 
-    <!-- NOTIFICATIONS -->
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
+
+  <!--
+    IMPORTANT :
+    1. Ce fichier règle la structure HTML et le chargement des scripts.
+    2. auth.js doit correctement initialiser Supabase et gérer les sessions.
+    3. script.js doit contenir le code des convertisseurs et des prix.
+    4. Vérifie que style.css, auth.js et script.js sont présents à la racine.
+    5. Une page HTML seule ne peut pas réparer des identifiants Supabase incorrects
+       ou des erreurs internes dans auth.js / script.js.
+  -->
 </body>
 </html>
