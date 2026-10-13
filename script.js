@@ -1,14 +1,24 @@
 "use strict";
 
-/* ==========================================
+/* =========================================================
    CRYPTOTOOLS GLOBAL
-   Navigation par vues + outils crypto
-   Convertisseurs, calculateurs et marché
-========================================== */
+   Script principal
+   Convertisseurs • Calculateurs • Marché • Navigation
+========================================================= */
 
 const API_URL = "https://api.coingecko.com/api/v3/simple/price";
 const EUR_TO_XOF = 655.957;
-const VIEW_IDS = ["home", "converters", "calculators", "markets", "about", "disclaimer"];
+const REFRESH_INTERVAL = 120000;
+const REQUEST_TIMEOUT = 15000;
+
+const VIEW_IDS = [
+  "home",
+  "converters",
+  "calculators",
+  "markets",
+  "about",
+  "disclaimer"
+];
 
 const ASSETS = {
   bitcoin: { name: "Bitcoin", symbol: "BTC", icon: "₿" },
@@ -67,7 +77,7 @@ const translations = {
     feesNote: "Les frais réels dépendent de la plateforme et du réseau utilisés.",
     marketEyebrow: "SUIVI DU MARCHÉ",
     marketTitle: "Prix des cryptomonnaies",
-    marketDescription: "Consultez les dernières données disponibles. Sélectionnez une cryptomonnaie pour ouvrir le marché.",
+    marketDescription: "Consultez les dernières données disponibles. Sélectionnez une cryptomonnaie pour afficher ses informations.",
     refreshButton: "↻ Actualiser",
     coinColumn: "Actif",
     priceColumn: "Prix (USD)",
@@ -144,7 +154,7 @@ const translations = {
     feesNote: "Actual fees depend on the platform and network used.",
     marketEyebrow: "MARKET TRACKER",
     marketTitle: "Cryptocurrency prices",
-    marketDescription: "View the latest available data. Select a cryptocurrency to open the market.",
+    marketDescription: "View the latest available data. Select a cryptocurrency to display its information.",
     refreshButton: "↻ Refresh",
     coinColumn: "Asset",
     priceColumn: "Price (USD)",
@@ -174,48 +184,53 @@ const translations = {
   }
 };
 
-/* ==========================================
-   ÉTAT GLOBAL
-========================================== */
+/* =========================================================
+   ÉTAT DE L'APPLICATION
+========================================================= */
 
 let currentLanguage = "fr";
-
-try {
-  currentLanguage = localStorage.getItem("ctg-language") || "fr";
-} catch {
-  currentLanguage = "fr";
-}
-
-if (!translations[currentLanguage]) {
-  currentLanguage = "fr";
-}
-
 let marketPrices = {};
 let lastSuccessfulUpdate = null;
-let toastTimer = null;
-let isFetchingPrices = false;
 let lastPriceError = null;
+let isFetchingPrices = false;
 let currentView = "home";
 let selectedAsset = "bitcoin";
 let navigationInitialized = false;
 let refreshIntervalId = null;
+let toastTimer = null;
+let activeRequestController = null;
 
-const $ = (selector, root = document) => root.querySelector(selector);
-const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+try {
+  const savedLanguage = localStorage.getItem("ctg-language");
 
-/* ==========================================
-   TRADUCTIONS
-========================================== */
-
-function getText(key) {
-  return translations[currentLanguage]?.[key] ??
-    translations.fr[key] ??
-    key;
+  if (savedLanguage && translations[savedLanguage]) {
+    currentLanguage = savedLanguage;
+  }
+} catch (error) {
+  console.warn("Stockage local indisponible.", error);
 }
 
-/* ==========================================
-   FORMATAGE
-========================================== */
+const $ = (selector, root = document) =>
+  root.querySelector(selector);
+
+const $$ = (selector, root = document) =>
+  Array.from(root.querySelectorAll(selector));
+
+/* =========================================================
+   TRADUCTIONS
+========================================================= */
+
+function getText(key) {
+  return (
+    translations[currentLanguage]?.[key] ??
+    translations.fr[key] ??
+    key
+  );
+}
+
+/* =========================================================
+   FORMATAGE DES NOMBRES
+========================================================= */
 
 function formatNumber(value, maximumFractionDigits = 2) {
   if (!Number.isFinite(value)) return "–";
@@ -242,7 +257,10 @@ function formatMoney(value, currency = "USD") {
       }
     ).format(value);
   } catch {
-    return `${formatNumber(value, currency === "XOF" ? 0 : 2)} ${currency}`;
+    return `${formatNumber(
+      value,
+      currency === "XOF" ? 0 : 2
+    )} ${currency}`;
   }
 }
 
@@ -256,9 +274,9 @@ function escapeHtml(value) {
   })[character]);
 }
 
-/* ==========================================
+/* =========================================================
    NOTIFICATIONS
-========================================== */
+========================================================= */
 
 function showToast(message) {
   const toast = $("#toast");
@@ -275,21 +293,23 @@ function showToast(message) {
     clearTimeout(toastTimer);
   }
 
-  toastTimer = setTimeout(() => {
+  toastTimer = window.setTimeout(() => {
     toast.classList.remove("show");
     toastTimer = null;
   }, 3500);
 }
 
-/* ==========================================
+/* =========================================================
    LECTURE DES NOMBRES
-========================================== */
+========================================================= */
 
 function readNumber(selector) {
   const element = $(selector);
+
   if (!element) return null;
 
   let raw = String(element.value ?? "").trim();
+
   if (!raw) return null;
 
   raw = raw.replace(/\s/g, "");
@@ -309,35 +329,45 @@ function readNumber(selector) {
   }
 
   const value = Number(raw);
+
   return Number.isFinite(value) ? value : null;
 }
 
 function isNonNegative(value) {
-  return value !== null && Number.isFinite(value) && value >= 0;
+  return (
+    value !== null &&
+    Number.isFinite(value) &&
+    value >= 0
+  );
 }
 
-/* ==========================================
-   NAVIGATION PAR VUES
-========================================== */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 function normalizeViewName(value) {
   const aliases = {
     "": "home",
     home: "home",
     accueil: "home",
+
     converters: "converters",
     converter: "converters",
     convertisseurs: "converters",
+
     calculators: "calculators",
     calculator: "calculators",
     calculateurs: "calculators",
+
     markets: "markets",
     market: "markets",
     marche: "markets",
     "marché": "markets",
+
     about: "about",
     apropos: "about",
     "à-propos": "about",
+
     disclaimer: "disclaimer",
     avertissement: "disclaimer"
   };
@@ -352,16 +382,42 @@ function normalizeViewName(value) {
 
 function getViewElement(viewName) {
   const aliases = {
-    home: ["#home", "#homeHero", "#hero", '[data-view="home"]'],
-    converters: ["#converters", "#convertisseurs", '[data-view="converters"]'],
-    calculators: ["#calculators", "#calculateurs", '[data-view="calculators"]'],
-    markets: ["#markets", "#market", "#marche", '[data-view="markets"]'],
-    about: ["#about", "#apropos", '[data-view="about"]'],
-    disclaimer: ["#disclaimer", '[data-view="disclaimer"]']
+    home: [
+      "#homeHero",
+      "#hero",
+      '[data-view="home"]',
+      "#home"
+    ],
+    converters: [
+      "#converters",
+      "#convertisseurs",
+      '[data-view="converters"]'
+    ],
+    calculators: [
+      "#calculators",
+      "#calculateurs",
+      '[data-view="calculators"]'
+    ],
+    markets: [
+      "#markets",
+      "#market",
+      "#marche",
+      '[data-view="markets"]'
+    ],
+    about: [
+      "#about",
+      "#apropos",
+      '[data-view="about"]'
+    ],
+    disclaimer: [
+      "#disclaimer",
+      '[data-view="disclaimer"]'
+    ]
   };
 
   for (const selector of aliases[viewName] || []) {
     const element = $(selector);
+
     if (element) return element;
   }
 
@@ -369,14 +425,21 @@ function getViewElement(viewName) {
 }
 
 function getMainContainer() {
-  return $("main") || $("#app") || $(".app-container") || document.body;
+  return (
+    $("main") ||
+    $("#app") ||
+    $(".app-container") ||
+    document.body
+  );
 }
 
 function ensureViewStyles() {
   if ($("#ctg-view-styles")) return;
 
   const style = document.createElement("style");
+
   style.id = "ctg-view-styles";
+
   style.textContent = `
     .ctg-view-hidden {
       display: none !important;
@@ -436,6 +499,7 @@ function ensureViewStyles() {
         opacity: .6;
         transform: translateY(3px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -465,7 +529,11 @@ function getSectionRoot(element) {
   for (const selector of selectors) {
     const root = element.closest(selector);
 
-    if (root && root !== $("main") && root !== $("#app")) {
+    if (
+      root &&
+      root !== $("main") &&
+      root !== $("#app")
+    ) {
       return root;
     }
   }
@@ -478,12 +546,16 @@ function collectViewRoots() {
 
   for (const viewName of VIEW_IDS) {
     const element = getViewElement(viewName);
+
     if (element) {
       roots[viewName] = getSectionRoot(element);
     }
   }
 
-  if (roots.home === $("main") || roots.home === $("#app")) {
+  const main = $("main");
+  const app = $("#app");
+
+  if (roots.home === main || roots.home === app) {
     const homeHero = $("#homeHero") || $("#hero");
 
     if (homeHero) {
@@ -503,6 +575,7 @@ function updateActiveNavigation(viewName) {
 
   links.forEach(link => {
     const href = link.getAttribute("href") || "";
+
     const target = normalizeViewName(
       link.dataset.navView ||
       link.dataset.viewLink ||
@@ -510,6 +583,7 @@ function updateActiveNavigation(viewName) {
     );
 
     const active = target === viewName;
+
     link.classList.toggle("active", active);
 
     if (active) {
@@ -522,10 +596,14 @@ function updateActiveNavigation(viewName) {
 
 function ensureBackButton() {
   let button = $("#ctgBackButton");
+
   if (button) return button;
 
   const main = getMainContainer();
-  if (!main || main === document.body) return null;
+
+  if (!main || main === document.body) {
+    return null;
+  }
 
   button = document.createElement("button");
   button.id = "ctgBackButton";
@@ -537,7 +615,11 @@ function ensureBackButton() {
   main.insertBefore(button, main.firstElementChild);
 
   button.addEventListener("click", () => {
-    if (window.history.length > 1 && window.history.state?.view) {
+    const previousView = normalizeViewName(
+      window.history.state?.view
+    );
+
+    if (window.history.length > 1 && previousView) {
       window.history.back();
     } else {
       navigateToView("home");
@@ -549,6 +631,7 @@ function ensureBackButton() {
 
 function updateBackButton() {
   const button = $("#ctgBackButton");
+
   if (!button) return;
 
   button.textContent = getText("backButton");
@@ -558,7 +641,10 @@ function updateBackButton() {
 function setViewVisibility(viewName) {
   const roots = collectViewRoots();
   const chosenRoot = roots[viewName];
-  const distinctRoots = new Set(Object.values(roots).filter(Boolean));
+
+  const distinctRoots = new Set(
+    Object.values(roots).filter(Boolean)
+  );
 
   if (distinctRoots.size > 1) {
     for (const [name, root] of Object.entries(roots)) {
@@ -566,9 +652,20 @@ function setViewVisibility(viewName) {
 
       const visible = name === viewName;
 
-      root.classList.toggle("ctg-view-hidden", !visible);
-      root.classList.toggle("ctg-view-visible", visible);
-      root.setAttribute("aria-hidden", String(!visible));
+      root.classList.toggle(
+        "ctg-view-hidden",
+        !visible
+      );
+
+      root.classList.toggle(
+        "ctg-view-visible",
+        visible
+      );
+
+      root.setAttribute(
+        "aria-hidden",
+        String(!visible)
+      );
     }
   } else if (chosenRoot) {
     chosenRoot.classList.remove("ctg-view-hidden");
@@ -605,8 +702,9 @@ function navigateToView(viewName, options = {}) {
 
   if (!target && normalized !== "home") {
     console.warn(
-      `CRYPTOTOOLS GLOBAL : élément de vue introuvable pour "${normalized}".`
+      `Vue introuvable : ${normalized}`
     );
+
     showToast(getText("noView"));
     return;
   }
@@ -621,13 +719,19 @@ function navigateToView(viewName, options = {}) {
   if (window.location.hash !== nextHash) {
     if (options.replace) {
       window.history.replaceState(
-        { ...(window.history.state || {}), view: normalized },
+        {
+          ...(window.history.state || {}),
+          view: normalized
+        },
         "",
         nextHash
       );
     } else {
       window.history.pushState(
-        { ...(window.history.state || {}), view: normalized },
+        {
+          ...(window.history.state || {}),
+          view: normalized
+        },
         "",
         nextHash
       );
@@ -638,7 +742,11 @@ function navigateToView(viewName, options = {}) {
 }
 
 function handleNavigationClick(event) {
-  const link = event.target.closest(
+  const target = event.target;
+
+  if (!(target instanceof Element)) return;
+
+  const link = target.closest(
     "#mainNav a, nav a, [data-nav-view], [data-view-link], a[href^='#']"
   );
 
@@ -670,34 +778,55 @@ function handleNavigationClick(event) {
 
 function setupNavigation() {
   if (navigationInitialized) return;
+
   navigationInitialized = true;
 
   ensureViewStyles();
   ensureBackButton();
 
-  document.addEventListener("click", handleNavigationClick);
+  document.addEventListener(
+    "click",
+    handleNavigationClick
+  );
 
   window.addEventListener("popstate", event => {
-    const stateView = normalizeViewName(event.state?.view);
-    const hashView = normalizeViewName(window.location.hash);
+    const stateView = normalizeViewName(
+      event.state?.view
+    );
+
+    const hashView = normalizeViewName(
+      window.location.hash
+    );
+
     const view = stateView || hashView || "home";
 
-    navigateToView(view, { fromHistory: true });
+    navigateToView(view, {
+      fromHistory: true
+    });
   });
 
   window.addEventListener("hashchange", () => {
-    const view = normalizeViewName(window.location.hash) || "home";
+    const view =
+      normalizeViewName(window.location.hash) ||
+      "home";
 
     if (view !== currentView) {
-      navigateToView(view, { fromHistory: true });
+      navigateToView(view, {
+        fromHistory: true
+      });
     }
   });
 
-  const initialView = normalizeViewName(window.location.hash) || "home";
+  const initialView =
+    normalizeViewName(window.location.hash) ||
+    "home";
 
   if (window.history.state?.view !== initialView) {
     window.history.replaceState(
-      { ...(window.history.state || {}), view: initialView },
+      {
+        ...(window.history.state || {}),
+        view: initialView
+      },
       "",
       `#${initialView}`
     );
@@ -706,25 +835,36 @@ function setupNavigation() {
   setViewVisibility(initialView);
 }
 
-/* ==========================================
+/* =========================================================
    PRIX DU MARCHÉ
-========================================== */
+========================================================= */
 
 function getUsdPrice(assetId) {
   const value = marketPrices[assetId]?.usd;
 
-  return Number.isFinite(value) && value > 0 ? value : null;
+  return (
+    Number.isFinite(value) && value > 0
+      ? value
+      : null
+  );
 }
 
 function getXofPrice(assetId) {
   const asset = marketPrices[assetId];
+
   if (!asset) return null;
 
-  if (Number.isFinite(asset.xof) && asset.xof > 0) {
+  if (
+    Number.isFinite(asset.xof) &&
+    asset.xof > 0
+  ) {
     return asset.xof;
   }
 
-  if (Number.isFinite(asset.eur) && asset.eur > 0) {
+  if (
+    Number.isFinite(asset.eur) &&
+    asset.eur > 0
+  ) {
     return asset.eur * EUR_TO_XOF;
   }
 
@@ -734,7 +874,11 @@ function getXofPrice(assetId) {
     Number.isFinite(marketPrices.__eurusd) &&
     marketPrices.__eurusd > 0
   ) {
-    return (asset.usd / marketPrices.__eurusd) * EUR_TO_XOF;
+    return (
+      asset.usd /
+      marketPrices.__eurusd *
+      EUR_TO_XOF
+    );
   }
 
   return null;
@@ -750,28 +894,34 @@ function updateHeroPrices() {
   for (const [selector, price] of Object.entries(prices)) {
     const element = $(selector);
 
-    if (element) {
-      element.textContent = price === null
+    if (!element) continue;
+
+    element.textContent =
+      price === null
         ? "–"
         : formatMoney(price, "USD");
-    }
   }
 
   const changeElement = $("#heroBtcChange");
 
   if (changeElement) {
-    changeElement.textContent = getUsdPrice("bitcoin") === null
-      ? "–"
-      : "USD";
+    changeElement.textContent =
+      getUsdPrice("bitcoin") === null
+        ? "–"
+        : "USD";
   }
 }
 
-/* ==========================================
-   SÉLECTION D’UNE CRYPTOMONNAIE
-========================================== */
+/* =========================================================
+   CRYPTOMONNAIE SÉLECTIONNÉE
+========================================================= */
 
 function ensureSelectedAssetDisplay() {
   if ($("#ctgSelectedAsset")) return;
+
+  const marketRoot = getViewElement("markets");
+
+  if (!marketRoot) return;
 
   const marketTitle =
     $("#marketTitle") ||
@@ -779,16 +929,17 @@ function ensureSelectedAssetDisplay() {
     $("#markets h2") ||
     $("#markets h3");
 
-  const marketRoot = getViewElement("markets");
-  if (!marketRoot) return;
-
   const info = document.createElement("div");
+
   info.id = "ctgSelectedAsset";
   info.className = "ctg-selected-asset";
   info.setAttribute("aria-live", "polite");
 
   if (marketTitle?.parentElement) {
-    marketTitle.parentElement.insertBefore(info, marketTitle.nextSibling);
+    marketTitle.parentElement.insertBefore(
+      info,
+      marketTitle.nextSibling
+    );
   } else {
     marketRoot.prepend(info);
   }
@@ -796,6 +947,7 @@ function ensureSelectedAssetDisplay() {
 
 function updateSelectedAssetDisplay() {
   const box = $("#ctgSelectedAsset");
+
   if (!box) return;
 
   const asset = ASSETS[selectedAsset];
@@ -825,11 +977,17 @@ function openMarketForAsset(assetId) {
   if (!ASSETS[assetId]) return;
 
   selectedAsset = assetId;
+
   navigateToView("markets");
 
   const select = $("#cryptoSelect");
 
-  if (select && [...select.options].some(option => option.value === assetId)) {
+  if (
+    select &&
+    Array.from(select.options).some(
+      option => option.value === assetId
+    )
+  ) {
     select.value = assetId;
     updateCryptoUnit();
 
@@ -844,7 +1002,9 @@ function openMarketForAsset(assetId) {
     row.removeAttribute("aria-current");
   });
 
-  const row = $(`#marketTableBody [data-asset-id="${CSS.escape(assetId)}"]`);
+  const row = $(
+    `#marketTableBody [data-asset-id="${CSS.escape(assetId)}"]`
+  );
 
   if (row) {
     row.setAttribute("aria-current", "true");
@@ -854,21 +1014,41 @@ function openMarketForAsset(assetId) {
 function attachMarketRowNavigation() {
   const tbody = $("#marketTableBody");
 
-  if (!tbody || tbody.dataset.navigationBound === "true") return;
+  if (
+    !tbody ||
+    tbody.dataset.navigationBound === "true"
+  ) {
+    return;
+  }
 
   tbody.dataset.navigationBound = "true";
 
   tbody.addEventListener("click", event => {
-    const row = event.target.closest("[data-asset-id]");
+    const target = event.target;
+
+    if (!(target instanceof Element)) return;
+
+    const row = target.closest("[data-asset-id]");
+
     if (!row) return;
 
     openMarketForAsset(row.dataset.assetId);
   });
 
   tbody.addEventListener("keydown", event => {
-    if (event.key !== "Enter" && event.key !== " ") return;
+    if (
+      event.key !== "Enter" &&
+      event.key !== " "
+    ) {
+      return;
+    }
 
-    const row = event.target.closest("[data-asset-id]");
+    const target = event.target;
+
+    if (!(target instanceof Element)) return;
+
+    const row = target.closest("[data-asset-id]");
+
     if (!row) return;
 
     event.preventDefault();
@@ -876,16 +1056,22 @@ function attachMarketRowNavigation() {
   });
 }
 
-/* ==========================================
-   TABLEAU DU MARCHÉ
-========================================== */
+/* =========================================================
+   TABLEAU DES PRIX
+========================================================= */
 
 function renderMarketTable() {
   const tbody = $("#marketTableBody");
+
   if (!tbody) return;
 
   const ids = Object.keys(ASSETS);
-  const hasPrices = ids.some(id => getUsdPrice(id) !== null || getXofPrice(id) !== null);
+
+  const hasPrices = ids.some(
+    id =>
+      getUsdPrice(id) !== null ||
+      getXofPrice(id) !== null
+  );
 
   if (!hasPrices) {
     tbody.innerHTML = `
@@ -927,9 +1113,11 @@ function renderMarketTable() {
             </span>
           </div>
         </td>
+
         <td class="market-price">
           ${usd === null ? "--" : escapeHtml(formatMoney(usd, "USD"))}
         </td>
+
         <td class="market-price">
           ${xof === null ? "--" : escapeHtml(formatMoney(xof, "XOF"))}
         </td>
@@ -941,24 +1129,26 @@ function renderMarketTable() {
   updateSelectedAssetDisplay();
 }
 
-/* ==========================================
+/* =========================================================
    TAUX USDT / FCFA
-========================================== */
+========================================================= */
 
 function updateUsdtRateNote() {
   const note = $("#usdtRateNote");
+
   if (!note) return;
 
   const rate = getXofPrice("tether");
 
-  note.textContent = rate === null
-    ? `${getText("fcfaRateLabel")} : --`
-    : `${getText("fcfaRateLabel")} : 1 USDT ≈ ${formatMoney(rate, "XOF")}`;
+  note.textContent =
+    rate === null
+      ? `${getText("fcfaRateLabel")} : --`
+      : `${getText("fcfaRateLabel")} : 1 USDT ≈ ${formatMoney(rate, "XOF")}`;
 }
 
-/* ==========================================
+/* =========================================================
    CHARGEMENT DES PRIX
-========================================== */
+========================================================= */
 
 async function fetchPrices() {
   if (isFetchingPrices) return;
@@ -973,24 +1163,35 @@ async function fetchPrices() {
   }
 
   const ids = Object.keys(ASSETS).join(",");
+
   const url = `${API_URL}?${new URLSearchParams({
     ids,
     vs_currencies: "usd,eur"
   })}`;
 
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+
+  activeRequestController = controller;
+
+  const timeoutId = window.setTimeout(
+    () => controller.abort(),
+    REQUEST_TIMEOUT
+  );
 
   try {
     const response = await fetch(url, {
       method: "GET",
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json"
+      },
       cache: "no-store",
       signal: controller.signal
     });
 
     if (!response.ok) {
-      throw new Error(`API response: ${response.status}`);
+      throw new Error(
+        `API CoinGecko : HTTP ${response.status}`
+      );
     }
 
     const data = await response.json();
@@ -1004,21 +1205,29 @@ async function fetchPrices() {
 
     for (const id of Object.keys(ASSETS)) {
       const item = data[id];
+
       if (!item) continue;
 
       const usd = Number(item.usd);
       const eur = Number(item.eur);
 
+      const validUsd =
+        Number.isFinite(usd) && usd > 0
+          ? usd
+          : null;
+
+      const validEur =
+        Number.isFinite(eur) && eur > 0
+          ? eur
+          : null;
+
       nextPrices[id] = {
-        usd: Number.isFinite(usd) && usd > 0 ? usd : null,
-        eur: Number.isFinite(eur) && eur > 0 ? eur : null,
+        usd: validUsd,
+        eur: validEur,
         xof: null
       };
 
-      if (
-        nextPrices[id].usd !== null ||
-        nextPrices[id].eur !== null
-      ) {
+      if (validUsd !== null || validEur !== null) {
         receivedAnyPrice = true;
       }
     }
@@ -1027,8 +1236,15 @@ async function fetchPrices() {
       throw new Error("Aucun prix valide reçu.");
     }
 
-    for (const id of Object.keys(nextPrices)) {
-      marketPrices[id] = nextPrices[id];
+    /*
+      Conserver les anciens prix lorsqu'un actif
+      n'est temporairement pas renvoyé par l'API.
+    */
+    for (const [id, price] of Object.entries(nextPrices)) {
+      marketPrices[id] = {
+        ...(marketPrices[id] || {}),
+        ...price
+      };
     }
 
     const btc = marketPrices.bitcoin;
@@ -1056,7 +1272,10 @@ async function fetchPrices() {
   } catch (error) {
     lastPriceError = error;
 
-    console.error("CryptoTools Global :", error);
+    console.error(
+      "CryptoTools Global : erreur de chargement des prix",
+      error
+    );
 
     showToast(getText("priceError"));
 
@@ -1076,7 +1295,9 @@ async function fetchPrices() {
 
   } finally {
     window.clearTimeout(timeoutId);
+
     isFetchingPrices = false;
+    activeRequestController = null;
 
     if (button) {
       button.disabled = false;
@@ -1085,9 +1306,9 @@ async function fetchPrices() {
   }
 }
 
-/* ==========================================
+/* =========================================================
    CONVERTISSEUR BTC -> USDT
-========================================== */
+========================================================= */
 
 function convertBtc() {
   const amount = readNumber("#btcAmount");
@@ -1099,32 +1320,38 @@ function convertBtc() {
     return;
   }
 
-  if (btcPrice === null || usdtPrice === null || usdtPrice <= 0) {
+  if (
+    btcPrice === null ||
+    usdtPrice === null ||
+    usdtPrice <= 0
+  ) {
     showToast(getText("priceError"));
     return;
   }
 
+  const result = (amount * btcPrice) / usdtPrice;
   const output = $("#btcResult");
 
   if (output) {
-    output.textContent = `${formatNumber((amount * btcPrice) / usdtPrice, 8)} USDT`;
+    output.textContent =
+      `${formatNumber(result, 8)} USDT`;
   }
 }
 
-/* ==========================================
+/* =========================================================
    CONVERTISSEUR USDT -> FCFA
-========================================== */
+========================================================= */
 
 function convertUsdt() {
   const amount = readNumber("#usdtAmount");
-  const price = getXofPrice("tether");
+  const rate = getXofPrice("tether");
 
   if (!isNonNegative(amount)) {
     showToast(getText("invalidAmount"));
     return;
   }
 
-  if (price === null) {
+  if (rate === null) {
     showToast(getText("priceError"));
     return;
   }
@@ -1132,26 +1359,33 @@ function convertUsdt() {
   const output = $("#usdtResult");
 
   if (output) {
-    output.textContent = `${formatNumber(amount * price, 0)} FCFA`;
+    output.textContent =
+      `${formatNumber(amount * rate, 0)} FCFA`;
   }
 }
 
-/* ==========================================
+/* =========================================================
    CONVERTISSEUR CRYPTO -> FCFA
-========================================== */
+========================================================= */
 
 function updateCryptoUnit() {
   const select = $("#cryptoSelect");
+
   if (!select) return;
 
   const asset = ASSETS[select.value];
   const unit = $("#cryptoUnit");
 
   if (unit) {
-    unit.textContent = asset ? asset.symbol : "CRYPTO";
+    unit.textContent = asset
+      ? asset.symbol
+      : "CRYPTO";
   }
 
-  selectedAsset = ASSETS[select.value] ? select.value : selectedAsset;
+  if (asset) {
+    selectedAsset = select.value;
+  }
+
   updateSelectedAssetDisplay();
 }
 
@@ -1161,12 +1395,17 @@ function convertCrypto() {
 
   if (!select) return;
 
-  const price = getXofPrice(select.value);
+  if (!ASSETS[select.value]) {
+    showToast(getText("priceError"));
+    return;
+  }
 
   if (!isNonNegative(amount)) {
     showToast(getText("invalidAmount"));
     return;
   }
+
+  const price = getXofPrice(select.value);
 
   if (price === null) {
     showToast(getText("priceError"));
@@ -1176,13 +1415,14 @@ function convertCrypto() {
   const output = $("#cryptoResult");
 
   if (output) {
-    output.textContent = `${formatNumber(amount * price, 0)} FCFA`;
+    output.textContent =
+      `${formatNumber(amount * price, 0)} FCFA`;
   }
 }
 
-/* ==========================================
+/* =========================================================
    CALCULATEUR DE PROFITS / PERTES
-========================================== */
+========================================================= */
 
 function calculateProfit() {
   const buy = readNumber("#buyPrice");
@@ -1200,19 +1440,26 @@ function calculateProfit() {
 
   const profit = (sell - buy) * quantity;
   const invested = buy * quantity;
-  const percentage = invested > 0 ? (profit / invested) * 100 : null;
+
+  const percentage =
+    invested > 0
+      ? (profit / invested) * 100
+      : null;
 
   const result = $("#profitResult");
 
   if (result) {
-    result.textContent = `${formatNumber(profit, 6)} USDT`;
-    result.classList.remove("positive-result", "negative-result");
+    result.textContent =
+      `${formatNumber(profit, 6)} USDT`;
+
+    result.classList.remove(
+      "positive-result",
+      "negative-result"
+    );
 
     if (profit > 0) {
       result.classList.add("positive-result");
-    }
-
-    if (profit < 0) {
+    } else if (profit < 0) {
       result.classList.add("negative-result");
     }
   }
@@ -1220,15 +1467,16 @@ function calculateProfit() {
   const percentageElement = $("#profitPercentage");
 
   if (percentageElement) {
-    percentageElement.textContent = percentage === null
-      ? "– %"
-      : `${formatNumber(percentage, 2)} %`;
+    percentageElement.textContent =
+      percentage === null
+        ? "– %"
+        : `${formatNumber(percentage, 2)} %`;
   }
 }
 
-/* ==========================================
+/* =========================================================
    CALCULATEUR DE FRAIS
-========================================== */
+========================================================= */
 
 function calculateFees() {
   const amount = readNumber("#transactionAmount");
@@ -1250,7 +1498,8 @@ function calculateFees() {
   const netOutput = $("#netAmountResult");
 
   if (feesOutput) {
-    feesOutput.textContent = `${formatNumber(fees, 6)} USDT`;
+    feesOutput.textContent =
+      `${formatNumber(fees, 6)} USDT`;
   }
 
   if (netOutput) {
@@ -1259,20 +1508,32 @@ function calculateFees() {
   }
 }
 
-/* ==========================================
-   ACTUALISATION DES CALCULS
-========================================== */
+/* =========================================================
+   MISE À JOUR AUTOMATIQUE DES CALCULS
+========================================================= */
 
 function updateAllCalculations() {
-  if (readNumber("#btcAmount") !== null) convertBtc();
-  if (readNumber("#usdtAmount") !== null) convertUsdt();
-  if (readNumber("#cryptoAmount") !== null) convertCrypto();
+  if (readNumber("#btcAmount") !== null) {
+    convertBtc();
+  }
+
+  if (readNumber("#usdtAmount") !== null) {
+    convertUsdt();
+  }
+
+  if (readNumber("#cryptoAmount") !== null) {
+    convertCrypto();
+  }
 
   const buy = readNumber("#buyPrice");
   const sell = readNumber("#sellPrice");
   const quantity = readNumber("#assetQuantity");
 
-  if (buy !== null && sell !== null && quantity !== null) {
+  if (
+    buy !== null &&
+    sell !== null &&
+    quantity !== null
+  ) {
     calculateProfit();
   }
 
@@ -1284,12 +1545,13 @@ function updateAllCalculations() {
   }
 }
 
-/* ==========================================
+/* =========================================================
    DERNIÈRE MISE À JOUR
-========================================== */
+========================================================= */
 
 function updateLastUpdatedLabel() {
   const element = $("#lastUpdated");
+
   if (!element) return;
 
   if (!lastSuccessfulUpdate) {
@@ -1305,12 +1567,13 @@ function updateLastUpdatedLabel() {
     }
   ).format(lastSuccessfulUpdate);
 
-  element.textContent = `${getText("lastUpdated")} : ${formatted}`;
+  element.textContent =
+    `${getText("lastUpdated")} : ${formatted}`;
 }
 
-/* ==========================================
+/* =========================================================
    TRADUCTION DE LA PAGE
-========================================== */
+========================================================= */
 
 function translatePage() {
   document.documentElement.lang = currentLanguage;
@@ -1338,9 +1601,15 @@ function translatePage() {
   }
 
   try {
-    localStorage.setItem("ctg-language", currentLanguage);
+    localStorage.setItem(
+      "ctg-language",
+      currentLanguage
+    );
   } catch (error) {
-    console.warn("Impossible d’enregistrer la langue :", error);
+    console.warn(
+      "Impossible d’enregistrer la langue :",
+      error
+    );
   }
 
   const backButton = $("#ctgBackButton");
@@ -1357,16 +1626,19 @@ function translatePage() {
   updateSelectedAssetDisplay();
 }
 
-/* ==========================================
+/* =========================================================
    MENU MOBILE
-========================================== */
+========================================================= */
 
 function setupMobileMenu() {
   const button = $("#menuToggle");
   const nav = $("#mainNav");
 
   if (!button || !nav) return;
-  if (button.dataset.menuBound === "true") return;
+
+  if (button.dataset.menuBound === "true") {
+    return;
+  }
 
   button.dataset.menuBound = "true";
   button.setAttribute("aria-expanded", "false");
@@ -1374,22 +1646,31 @@ function setupMobileMenu() {
   button.addEventListener("click", () => {
     const open = nav.classList.toggle("open");
 
-    button.setAttribute("aria-expanded", String(open));
+    button.setAttribute(
+      "aria-expanded",
+      String(open)
+    );
+
     button.textContent = open ? "✕" : "☰";
   });
 
   nav.querySelectorAll("a").forEach(link => {
     link.addEventListener("click", () => {
       nav.classList.remove("open");
-      button.setAttribute("aria-expanded", "false");
+
+      button.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
       button.textContent = "☰";
     });
   });
 }
 
-/* ==========================================
-   LIENS D’ACCÈS RAPIDE
-========================================== */
+/* =========================================================
+   LIENS D'ACCÈS RAPIDE
+========================================================= */
 
 function setupQuickNavigation() {
   const quickLinks = [
@@ -1409,9 +1690,7 @@ function setupQuickNavigation() {
       view: "markets"
     },
     {
-      selectors: [
-        "#marketPreview"
-      ],
+      selectors: ["#marketPreview"],
       view: "markets"
     }
   ];
@@ -1419,7 +1698,11 @@ function setupQuickNavigation() {
   for (const item of quickLinks) {
     for (const selector of item.selectors) {
       $$(selector).forEach(element => {
-        if (element.dataset.quickNavigationBound === "true") return;
+        if (
+          element.dataset.quickNavigationBound === "true"
+        ) {
+          return;
+        }
 
         element.dataset.quickNavigationBound = "true";
 
@@ -1435,34 +1718,54 @@ function setupQuickNavigation() {
   }
 }
 
-/* ==========================================
-   ÉVÉNEMENTS
-========================================== */
+/* =========================================================
+   ÉVÉNEMENTS DES OUTILS
+========================================================= */
 
 function setupEvents() {
   const bindClick = (selector, callback) => {
     const element = $(selector);
 
-    if (element && element.dataset.eventBound !== "true") {
-      element.dataset.eventBound = "true";
-
-      element.addEventListener("click", event => {
-        event.preventDefault();
-        callback();
-      });
+    if (
+      !element ||
+      element.dataset.eventBound === "true"
+    ) {
+      return;
     }
+
+    element.dataset.eventBound = "true";
+
+    element.addEventListener("click", event => {
+      event.preventDefault();
+      callback();
+    });
   };
 
   bindClick("#convertBtcButton", convertBtc);
   bindClick("#convertUsdtButton", convertUsdt);
   bindClick("#convertCryptoButton", convertCrypto);
-  bindClick("#calculateProfitButton", calculateProfit);
-  bindClick("#calculateFeesButton", calculateFees);
-  bindClick("#refreshPricesButton", fetchPrices);
+
+  bindClick(
+    "#calculateProfitButton",
+    calculateProfit
+  );
+
+  bindClick(
+    "#calculateFeesButton",
+    calculateFees
+  );
+
+  bindClick(
+    "#refreshPricesButton",
+    fetchPrices
+  );
 
   const cryptoSelect = $("#cryptoSelect");
 
-  if (cryptoSelect && cryptoSelect.dataset.eventBound !== "true") {
+  if (
+    cryptoSelect &&
+    cryptoSelect.dataset.eventBound !== "true"
+  ) {
     cryptoSelect.dataset.eventBound = "true";
 
     cryptoSelect.addEventListener("change", () => {
@@ -1476,11 +1779,16 @@ function setupEvents() {
 
   const languageSelect = $("#languageSelect");
 
-  if (languageSelect && languageSelect.dataset.eventBound !== "true") {
+  if (
+    languageSelect &&
+    languageSelect.dataset.eventBound !== "true"
+  ) {
     languageSelect.dataset.eventBound = "true";
 
     languageSelect.addEventListener("change", event => {
-      currentLanguage = event.target.value === "en" ? "en" : "fr";
+      currentLanguage =
+        event.target.value === "en" ? "en" : "fr";
+
       translatePage();
     });
   }
@@ -1488,7 +1796,8 @@ function setupEvents() {
   const yearElement = $("#currentYear");
 
   if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
+    yearElement.textContent =
+      new Date().getFullYear();
   }
 
   const inputSelectors = [
@@ -1505,38 +1814,56 @@ function setupEvents() {
   inputSelectors.forEach(selector => {
     const input = $(selector);
 
-    if (!input || input.dataset.eventBound === "true") return;
+    if (
+      !input ||
+      input.dataset.eventBound === "true"
+    ) {
+      return;
+    }
 
     input.dataset.eventBound = "true";
-    input.addEventListener("input", updateAllCalculations);
+
+    input.addEventListener(
+      "input",
+      updateAllCalculations
+    );
   });
 
   setupMobileMenu();
   setupQuickNavigation();
 }
 
-/* ==========================================
+/* =========================================================
    INITIALISATION
-========================================== */
+========================================================= */
 
 function initializeSite() {
   setupNavigation();
   setupEvents();
+
   ensureSelectedAssetDisplay();
+
   updateCryptoUnit();
   translatePage();
 
   fetchPrices();
 
   if (refreshIntervalId !== null) {
-    clearInterval(refreshIntervalId);
+    window.clearInterval(refreshIntervalId);
   }
 
-  refreshIntervalId = window.setInterval(fetchPrices, 120000);
+  refreshIntervalId = window.setInterval(
+    fetchPrices,
+    REFRESH_INTERVAL
+  );
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeSite, { once: true });
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeSite,
+    { once: true }
+  );
 } else {
   initializeSite();
 }
